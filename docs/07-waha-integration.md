@@ -75,6 +75,11 @@ sama dengan yang dipakai container (interpolasi `${WAHA_API_KEY}` dari `.env`
 root). API backend + dashboard `/admin/whatsapp` langsung bisa dipakai untuk
 pairing QR, sync grup, dan test-message — tanpa deploy production.
 
+Login dashboard (`:3008/dashboard`) dan Swagger (`:3008/`) WAHA memakai
+`WAHA_DASHBOARD_USERNAME/PASSWORD` dan `WHATSAPP_SWAGGER_USERNAME/PASSWORD`
+dari `.env` yang sama. Isi passwordnya — bila dikosongkan WAHA membuat
+password acak setiap restart (cek log container).
+
 ## 7.9 Error mapping (backend → UI)
 
 | Gejala WAHA | Kode API | Pesan UI |
