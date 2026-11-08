@@ -12,6 +12,7 @@ import { ValidationNotice } from "../components/landing/validation-notice";
 import { WeeklyPrayerTable } from "../components/landing/weekly-prayer-table";
 import { WhatsappBanner } from "../components/landing/whatsapp-banner";
 import { fetchApi } from "../lib/api-client";
+import { computeSlotStatus } from "../lib/prayer-slot";
 import type {
 	SlotStatus,
 	TodayPrayerData,
@@ -77,12 +78,18 @@ export default function HomePage() {
 	}, []);
 
 	const [paramTheme, setParamTheme] = useState<"light" | "dark" | null>(null);
+	const [paramPhase, setParamPhase] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (typeof window !== "undefined") {
-			const t = new URLSearchParams(window.location.search).get("theme")?.toLowerCase();
+			const searchParams = new URLSearchParams(window.location.search);
+			const t = searchParams.get("theme")?.toLowerCase();
 			if (t === "light" || t === "dark") {
 				setParamTheme(t as "light" | "dark");
+			}
+			const p = searchParams.get("phase")?.toUpperCase();
+			if (p) {
+				setParamPhase(p);
 			}
 		}
 	}, []);
@@ -154,21 +161,34 @@ export default function HomePage() {
 		});
 	}, [data?.dateLocal]);
 
+	const effectiveServerTime = useMemo(() => {
+		if (paramPhase && data) {
+			switch (paramPhase) {
+				case "SUBUH":
+					return new Date(data.times.FAJR.utc).getTime() + 60000;
+				case "DZUHUR":
+					return new Date(data.times.DHUHR.utc).getTime() + 60000;
+				case "ASHAR":
+					return new Date(data.times.ASR.utc).getTime() + 60000;
+				case "MAGHRIB":
+					return new Date(data.times.MAGHRIB.utc).getTime() + 60000;
+				case "ISHA":
+					return new Date(data.times.ISHA.utc).getTime() + 60000;
+			}
+		}
+		return now !== null ? now + serverSkewMs : null;
+	}, [data, now, paramPhase, serverSkewMs]);
+
 	const getSlotStatus = useCallback(
 		(utcString: string, prayerName: string): SlotStatus => {
-			if (!now || !data) return "UPCOMING";
-			const currentServerTime = now + serverSkewMs;
-			const targetTime = new Date(utcString).getTime();
-
-			if (data.nextPrayer.prayerName === prayerName && !data.nextPrayer.isTomorrow) {
-				return "NEXT";
-			}
-			if (targetTime < currentServerTime) {
-				return "PASSED";
-			}
-			return "UPCOMING";
+			return computeSlotStatus({
+				data,
+				currentServerTime: effectiveServerTime,
+				utcString,
+				prayerName,
+			});
 		},
-		[data, now, serverSkewMs],
+		[data, effectiveServerTime],
 	);
 
 	return (
