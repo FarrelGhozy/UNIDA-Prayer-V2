@@ -10,12 +10,19 @@ import { NextPrayerHero } from "../components/landing/next-prayer-hero";
 import { PrayerTimesGrid } from "../components/landing/prayer-times-grid";
 import { SkeletonLoading } from "../components/landing/skeleton-loading";
 import { ValidationNotice } from "../components/landing/validation-notice";
+import { WeeklyPrayerTable } from "../components/landing/weekly-prayer-table";
 import { WhatsappBanner } from "../components/landing/whatsapp-banner";
 import { fetchApi } from "../lib/api-client";
-import type { SlotStatus, TodayPrayerData } from "../types/prayer";
+import type {
+	SlotStatus,
+	TodayPrayerData,
+	WeeklyPrayerDay,
+	WeeklyPrayerResponse,
+} from "../types/prayer";
 
 export default function HomePage() {
 	const [data, setData] = useState<TodayPrayerData | null>(null);
+	const [weeklyDays, setWeeklyDays] = useState<WeeklyPrayerDay[] | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 	const [refreshing, setRefreshing] = useState(false);
@@ -32,19 +39,26 @@ export default function HomePage() {
 		setError(null);
 
 		const clientFetchStart = Date.now();
-		const res = await fetchApi<TodayPrayerData>("/api/public/prayer/today");
+		const [resToday, resWeek] = await Promise.all([
+			fetchApi<TodayPrayerData>("/api/public/prayer/today"),
+			fetchApi<WeeklyPrayerResponse>("/api/public/prayer/week"),
+		]);
 
-		if (res.error || !res.data) {
+		if (resToday.error || !resToday.data) {
 			setError(
-				res.error?.message ||
+				resToday.error?.message ||
 					"Jadwal shalat belum dapat dimuat dari server backend.",
 			);
 			setData(null);
 		} else {
-			const serverTime = new Date(res.data.serverNowUtc).getTime();
+			const serverTime = new Date(resToday.data.serverNowUtc).getTime();
 			const latency = (Date.now() - clientFetchStart) / 2;
 			setServerSkewMs(serverTime + latency - Date.now());
-			setData(res.data);
+			setData(resToday.data);
+		}
+
+		if (resWeek.data?.days) {
+			setWeeklyDays(resWeek.data.days);
 		}
 
 		setLoading(false);
@@ -62,6 +76,31 @@ export default function HomePage() {
 		}, 1000);
 		return () => clearInterval(timer);
 	}, []);
+
+	// Tema otomatis: Terbit s.d. Maghrib = Terang, di luar itu = Gelap
+	const isDaytime = useMemo(() => {
+		const currentTime = (now ?? Date.now()) + serverSkewMs;
+		if (data?.times?.SUNRISE?.utc && data?.times?.MAGHRIB?.utc) {
+			const tSunrise = new Date(data.times.SUNRISE.utc).getTime();
+			const tMaghrib = new Date(data.times.MAGHRIB.utc).getTime();
+			return currentTime >= tSunrise && currentTime < tMaghrib;
+		}
+		const hour = new Date(currentTime).getHours();
+		return hour >= 5 && hour < 18;
+	}, [data, now, serverSkewMs]);
+
+	const theme: "light" | "dark" = isDaytime ? "light" : "dark";
+
+	// Countdown auto-advance: jika waktu tiba (00), langsung muat waktu shalat berikutnya
+	const nextPrayerUtc = data?.nextPrayer?.scheduledAtUtc;
+	useEffect(() => {
+		if (!now || !nextPrayerUtc) return;
+		const targetUtc = new Date(nextPrayerUtc).getTime();
+		const currentServerTime = now + serverSkewMs;
+		if (currentServerTime >= targetUtc) {
+			loadPrayerData(true);
+		}
+	}, [now, nextPrayerUtc, serverSkewMs, loadPrayerData]);
 
 	const countdown = useMemo(() => {
 		if (!now || !data?.nextPrayer?.scheduledAtUtc) return null;
@@ -122,14 +161,15 @@ export default function HomePage() {
 	);
 
 	return (
-		<div className="relative flex min-h-screen flex-col bg-transparent">
+		<div className={`relative flex min-h-screen flex-col transition-colors duration-700 ${theme === "dark" ? "dark bg-[#06111D] text-white" : "bg-transparent text-[#172B43]"}`}>
 			<DynamicPrayerBackground
 				data={data}
 				now={now}
 				serverSkewMs={serverSkewMs}
+				theme={theme}
 			/>
 
-			<Header liveTimeString={liveTimeString} />
+			<Header liveTimeString={liveTimeString} theme={theme} />
 
 			<main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
 				<div className="mx-auto max-w-5xl space-y-6 sm:space-y-8">
@@ -162,6 +202,8 @@ export default function HomePage() {
 								onRefresh={() => loadPrayerData(true)}
 								getSlotStatus={getSlotStatus}
 							/>
+
+							<WeeklyPrayerTable days={weeklyDays} loading={loading} />
 
 							<WhatsappBanner />
 

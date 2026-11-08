@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Clock, Timer } from "lucide-react";
 import type { NextPrayerInfo } from "../../types/prayer";
 
@@ -62,36 +63,49 @@ export function NextPrayerHero({
 				</div>
 
 				{countdown && (
-					<div className="rounded-2xl bg-white/10 p-4.5 backdrop-blur-md ring-1 ring-white/20 sm:p-5 shadow-inner">
-						<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
-							Menuju Kumandang Adzan
-						</span>
-						<div className="mt-2.5 flex items-baseline gap-2.5">
-							<div className="flex flex-col items-center">
-								<span className="tabular-nums font-mono text-3xl font-extrabold text-white sm:text-4xl">
-									{countdown.hours}
-								</span>
-								<span className="text-[10px] uppercase tracking-wider text-slate-300">
-									Jam
-								</span>
-							</div>
-							<span className="font-mono text-2xl font-bold text-[#6BA9D8] animate-pulse">:</span>
-							<div className="flex flex-col items-center">
-								<span className="tabular-nums font-mono text-3xl font-extrabold text-white sm:text-4xl">
-									{countdown.minutes}
-								</span>
-								<span className="text-[10px] uppercase tracking-wider text-slate-300">
-									Menit
-								</span>
-							</div>
-							<span className="font-mono text-2xl font-bold text-[#6BA9D8] animate-pulse">:</span>
-							<div className="flex flex-col items-center">
-								<span className="tabular-nums font-mono text-3xl font-extrabold text-emerald-400 sm:text-4xl">
-									{countdown.seconds}
-								</span>
-								<span className="text-[10px] uppercase tracking-wider text-slate-300">
-									Detik
-								</span>
+					<div className="relative overflow-hidden rounded-2xl bg-white/10 p-4.5 backdrop-blur-md ring-1 ring-white/20 sm:p-5 shadow-inner">
+						<div className="pointer-events-none absolute -right-2 -bottom-2 h-28 w-28 opacity-15 sm:h-32 sm:w-32 select-none">
+							<Image
+								src="/unida-logo.png"
+								alt=""
+								fill
+								sizes="128px"
+								className="object-contain filter brightness-0 invert"
+								priority
+							/>
+						</div>
+
+						<div className="relative z-10">
+							<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
+								Menuju Kumandang Adzan
+							</span>
+							<div className="mt-2.5 flex items-baseline gap-2.5">
+								<div className="flex flex-col items-center">
+									<span className="tabular-nums font-mono text-3xl font-extrabold text-white sm:text-4xl">
+										{countdown.hours}
+									</span>
+									<span className="text-[10px] uppercase tracking-wider text-slate-300">
+										Jam
+									</span>
+								</div>
+								<span className="font-mono text-2xl font-bold text-[#6BA9D8] animate-pulse">:</span>
+								<div className="flex flex-col items-center">
+									<span className="tabular-nums font-mono text-3xl font-extrabold text-white sm:text-4xl">
+										{countdown.minutes}
+									</span>
+									<span className="text-[10px] uppercase tracking-wider text-slate-300">
+										Menit
+									</span>
+								</div>
+								<span className="font-mono text-2xl font-bold text-[#6BA9D8] animate-pulse">:</span>
+								<div className="flex flex-col items-center">
+									<span className="tabular-nums font-mono text-3xl font-extrabold text-emerald-400 sm:text-4xl">
+										{countdown.seconds}
+									</span>
+									<span className="text-[10px] uppercase tracking-wider text-slate-300">
+										Detik
+									</span>
+								</div>
 							</div>
 						</div>
 					</div>

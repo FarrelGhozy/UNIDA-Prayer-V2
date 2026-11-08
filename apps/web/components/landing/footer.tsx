@@ -14,6 +14,9 @@ export function Footer() {
 						<p className="text-[11px] text-slate-400 text-center sm:text-right">
 							© 2026 Universitas Darussalam Gontor • UNIDA Prayer System V2.0
 						</p>
+						<p className="text-[10px] text-slate-400/80 font-medium tracking-wide text-center sm:text-right">
+							Dibuat Oleh FarrelGhozy
+						</p>
 					</div>
 				</div>
 			</div>

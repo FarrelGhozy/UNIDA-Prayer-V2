@@ -54,8 +54,8 @@ _UNIDA Prayer System V2.0_`;
 
 	return (
 		<div>
-			<div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-4 py-3 shadow-xs backdrop-blur-md">
-				<h3 className="text-sm font-bold text-[#102A46] sm:text-base">
+			<div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/90 bg-white/95 px-4 py-3 shadow-xs backdrop-blur-md dark:border-white/10 dark:bg-[#0D2137]/90">
+				<h3 className="text-sm font-bold text-[#102A46] sm:text-base dark:text-white">
 					Jadwal Shalat Hari Ini
 				</h3>
 
@@ -63,17 +63,17 @@ _UNIDA Prayer System V2.0_`;
 					<button
 						type="button"
 						onClick={handleCopySchedule}
-						className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-[#123B6D] transition"
+						className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-700 shadow-2xs hover:bg-slate-50 hover:text-[#123B6D] transition dark:border-white/10 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20"
 						title="Salin ringkasan jadwal untuk dibagikan ke WhatsApp"
 					>
 						{copied ? (
 							<>
 								<Check className="h-3.5 w-3.5 text-emerald-600" />
-								<span className="text-emerald-700">Tersalin!</span>
+								<span className="text-emerald-700 dark:text-emerald-400">Tersalin!</span>
 							</>
 						) : (
 							<>
-								<Copy className="h-3.5 w-3.5 text-slate-500" />
+								<Copy className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
 								<span>Salin Jadwal</span>
 							</>
 						)}
@@ -83,7 +83,7 @@ _UNIDA Prayer System V2.0_`;
 						type="button"
 						onClick={onRefresh}
 						disabled={refreshing}
-						className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200/90 bg-blue-50/70 px-2.5 py-1.5 text-xs font-semibold text-[#1D5FA7] hover:bg-blue-100/70 transition disabled:opacity-50"
+						className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200/90 bg-blue-50/70 px-2.5 py-1.5 text-xs font-semibold text-[#1D5FA7] hover:bg-blue-100/70 transition disabled:opacity-50 dark:border-[#1D5FA7]/40 dark:bg-blue-950/60 dark:text-[#6BA9D8] dark:hover:bg-blue-900/60"
 					>
 						<RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
 						<span>Perbarui</span>

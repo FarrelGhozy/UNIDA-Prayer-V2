@@ -46,3 +46,27 @@ export interface TodayPrayerData {
 }
 
 export type SlotStatus = "PASSED" | "NEXT" | "UPCOMING";
+
+export interface WeeklyPrayerDay {
+	dateLocal: string;
+	dayName: string;
+	dayFormatted: string;
+	isToday: boolean;
+	isFriday: boolean;
+	hijri: HijriDateInfo;
+	times: {
+		fajr: string;
+		sunrise: string;
+		dhuhr: string;
+		asr: string;
+		maghrib: string;
+		isha: string;
+	};
+}
+
+export interface WeeklyPrayerResponse {
+	locationName: string;
+	timezone: string;
+	startDate: string;
+	days: WeeklyPrayerDay[];
+}

@@ -12,6 +12,7 @@ export interface DynamicPrayerBackgroundProps {
 	now?: number | null;
 	serverSkewMs?: number;
 	overlayClassName?: string;
+	theme?: "light" | "dark";
 }
 
 interface BackgroundVariant {
@@ -101,6 +102,7 @@ export function DynamicPrayerBackground({
 	now: propNow,
 	serverSkewMs: propServerSkewMs,
 	overlayClassName,
+	theme = "light",
 }: DynamicPrayerBackgroundProps = {}) {
 	const [internalNow, setInternalNow] = useState<number | null>(() =>
 		propNow !== undefined ? propNow : null,
@@ -148,7 +150,9 @@ export function DynamicPrayerBackground({
 	);
 
 	const defaultOverlay =
-		"bg-linear-to-b from-[#0A1B2E]/55 via-[#102A46]/35 to-[#F5F8FC]/95 backdrop-blur-[2px]";
+		theme === "dark"
+			? "bg-linear-to-b from-[#06111D]/80 via-[#0A1B2E]/85 to-[#050C16]/98 backdrop-blur-[2px]"
+			: "bg-linear-to-b from-[#0A1B2E]/55 via-[#102A46]/35 to-[#F5F8FC]/95 backdrop-blur-[2px]";
 
 	return (
 		<aside
