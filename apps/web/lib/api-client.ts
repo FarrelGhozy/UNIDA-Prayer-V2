@@ -8,6 +8,28 @@ export interface ApiResponse<T> {
 	error: ApiError | null;
 }
 
+const DEFAULT_ERROR_MESSAGE = "Terjadi kendala saat menghubungi server.";
+const SERVER_UNAVAILABLE_MESSAGE =
+	"Layanan server sedang tidak tersedia. Silakan coba beberapa saat lagi.";
+
+function httpErrorMessage(status: number): string {
+	if (status === 404) return "Layanan atau data tidak ditemukan.";
+	if (status === 503) {
+		return "Layanan server sedang dalam pemeliharaan atau DB belum siap.";
+	}
+	if (status >= 500) return SERVER_UNAVAILABLE_MESSAGE;
+	return DEFAULT_ERROR_MESSAGE;
+}
+
+function isApiResponse(value: unknown): value is ApiResponse<unknown> {
+	return (
+		typeof value === "object" &&
+		value !== null &&
+		!Array.isArray(value) &&
+		("data" in value || "error" in value)
+	);
+}
+
 // URL basis API:
 // - NEXT_PUBLIC_API_URL (disarankan dikosongkan di dev/prod agar same-origin
 //   "/api/..." lewat rewrite Next.js di next.config.ts → tidak kena CORS).
@@ -56,33 +78,49 @@ export async function fetchApi<T>(
 			credentials: "include",
 		});
 
-		const json = (await res.json()) as ApiResponse<T>;
+		// Proxy Next.js bisa membalas teks non-JSON (mis. "Internal Server Error").
+		// Baca sebagai teks dulu agar pesan parse mentah tidak bocor ke UI.
+		const text = await res.text();
+		let json: ApiResponse<T> | null = null;
+		if (text.length > 0) {
+			try {
+				const parsed: unknown = JSON.parse(text);
+				if (isApiResponse(parsed)) {
+					json = parsed as ApiResponse<T>;
+				}
+			} catch {
+				json = null;
+			}
+		}
 
 		if (!res.ok) {
 			return {
 				data: null,
 				error: json?.error || {
 					code: `HTTP_${res.status}`,
-					message:
-						res.status === 404
-							? "Layanan atau data tidak ditemukan."
-							: res.status === 503
-								? "Layanan server sedang dalam pemeliharaan atau DB belum siap."
-								: "Terjadi kendala saat menghubungi server.",
+					message: httpErrorMessage(res.status),
+				},
+			};
+		}
+
+		if (!json) {
+			return {
+				data: null,
+				error: {
+					code: "INVALID_RESPONSE",
+					message: "Respons dari server tidak dapat dibaca. Silakan coba lagi.",
 				},
 			};
 		}
 
 		return json;
-	} catch (err) {
+	} catch {
 		return {
 			data: null,
 			error: {
 				code: "NETWORK_ERROR",
 				message:
-					err instanceof Error
-						? err.message
-						: "Gagal terhubung ke server API UNIDA Prayer.",
+					"Gagal terhubung ke server UNIDA Prayer. Periksa koneksi Anda lalu coba lagi.",
 			},
 		};
 	}
