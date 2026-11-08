@@ -18,17 +18,18 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      INTERNAL_API_URL: http://api:3001
+      # Untuk SSR. Rewrite /api dibekukan saat build (lihat §10.2).
+      INTERNAL_API_URL: http://api:3511
       NEXT_PUBLIC_API_BASE_URL: /api
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3542:3000"
     depends_on:
       - api
   api:
     image: ghcr.io/OWNER/unida-prayer-v2-api:latest
     restart: unless-stopped
     env_file: [.env]
-    expose: ["3001"]
+    expose: ["3511"]
     depends_on: [waha]
   worker:
     image: ghcr.io/OWNER/unida-prayer-v2-api:latest
@@ -64,6 +65,8 @@ Aturan:
 
 Dockerfile wajib: dukung Bun Workspace, copy hasil build benar, non-root bila memungkinkan, `NODE_ENV=production`, tangani `migrations` ikut image API.
 
+**Penting — rewrite `/api` bersifat build-time.** `rewrites()` di `next.config.ts` dieksekusi saat `next build`, lalu tujuan proxy dibekukan ke `.next/routes-manifest.json`. Mengubah `INTERNAL_API_URL` di environment container saat runtime **tidak** mengubah rewrite. Karena itu `web.Dockerfile` menerima `ARG INTERNAL_API_URL` (default `http://api:3511`) dan CI wajib mengirim build-arg tersebut saat membangun image web.
+
 ## 10.3 Environment
 
 `.env.example` (tanpa secret asli):
@@ -72,12 +75,12 @@ Dockerfile wajib: dukung Bun Workspace, copy hasil build benar, non-root bila me
 NODE_ENV=production
 APP_SECRET=replace-with-long-random-secret
 WEB_URL=https://prayer.example.ac.id
-API_PORT=3001
+API_PORT=3511
 DATABASE_URL=mysql://unida_prayer:CHANGE_ME@DB_HOST:3306/unida_prayer
 WAHA_BASE_URL=http://waha:3000
 WAHA_API_KEY=CHANGE_ME
 WAHA_SESSION=unida-prayer
-INTERNAL_API_URL=http://api:3001
+INTERNAL_API_URL=http://api:3511
 NEXT_PUBLIC_API_BASE_URL=/api
 ```
 
@@ -89,6 +92,7 @@ File: `.github/workflows/build.yml`
 
 - `pull_request → main`: install frozen + typecheck + lint + test + build (tanpa push).
 - `push → main`: checks lolos → login GHCR → build+push web+api (`latest` + SHA).
+- Build image web **wajib** memakai `build-args: INTERNAL_API_URL=http://api:3511` agar rewrite `/api` benar.
 - Permissions minimal (`contents:read`, `packages:write`). Tanpa SSH key, tanpa secret DB/WAHA di workflow. Pin versi actions + base image.
 
 Script root yang harus ada (nama final, kunci Q-DX-01): `typecheck, lint, test, build, db:migrate, admin:seed, worker`.

@@ -42,7 +42,7 @@
 
 ### Q-OPS-01 — Domain + reverse proxy + TLS
 
-- Konteks: Compose publish loopback; butuh proxy ke `web:3000` + `/api` ke `api:3001` (atau via web rewrite).
+- Konteks: Compose publish loopback (`127.0.0.1:3542` → `web:3000`); butuh proxy ke `web:3000` + `/api` ke `api:3511` (atau via web rewrite).
 - Ditanya: domain final (ganti `prayer.example.ac.id`)? Proxy yang dipakai (Nginx/Caddy/Traefik bawaan)? Siapa yang setting TLS?
 
 ### Q-PRAY-01 — Library timezone final

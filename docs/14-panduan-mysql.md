@@ -51,7 +51,7 @@ mysql -h DB_HOST -P 3306 -u unida_prayer -p -e "SELECT 1;"
 
 # 2. Dari aplikasi (setelah Phase 1)
 bun run db:migrate
-curl -s http://localhost:3001/api/ready
+curl -s http://localhost:3511/api/ready
 ```
 
 ## 14.5 Backup (tugas pemilik server)

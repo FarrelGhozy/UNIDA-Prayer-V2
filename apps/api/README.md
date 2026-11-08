@@ -30,7 +30,7 @@ Backend service untuk **UNIDA Prayer V2** yang menyediakan RESTful API berbasis 
 ## 💻 Menjalankan Secara Lokal
 
 ```bash
-# Menjalankan server API (port 3001)
+# Menjalankan server API (port 3511)
 bun run dev
 
 # Menjalankan worker scheduler background

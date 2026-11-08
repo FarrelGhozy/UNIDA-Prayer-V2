@@ -1122,7 +1122,7 @@ NODE_ENV=production
 APP_ENV=production
 APP_SECRET=replace-with-long-random-secret
 WEB_URL=https://prayer.example.ac.id
-API_PORT=3001
+API_PORT=3511
 
 # Database - external MySQL
 DATABASE_URL=mysql://unida_prayer:CHANGE_ME@DB_HOST:3306/unida_prayer
@@ -1133,7 +1133,7 @@ WAHA_API_KEY=CHANGE_ME
 WAHA_SESSION=unida-prayer
 
 # Frontend server-side API access
-INTERNAL_API_URL=http://api:3001
+INTERNAL_API_URL=http://api:3511
 NEXT_PUBLIC_API_BASE_URL=/api
 ```
 
@@ -1173,10 +1173,10 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      INTERNAL_API_URL: http://api:3001
+      INTERNAL_API_URL: http://api:3511
       NEXT_PUBLIC_API_BASE_URL: /api
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3542:3000"
     depends_on:
       - api
 
@@ -1186,7 +1186,7 @@ services:
     env_file:
       - .env
     expose:
-      - "3001"
+      - "3511"
     depends_on:
       - waha
 
@@ -1218,6 +1218,7 @@ Catatan untuk implementasi Compose:
 
 - Ganti `OWNER` dan `PINNED_VERSION` dengan nilai aktual.
 - Pastikan port dan variabel environment sesuai versi WAHA yang digunakan.
+- Rewrite `/api` di Next.js dibekukan saat `next build`; build image web dengan `--build-arg INTERNAL_API_URL=http://api:3511` (CI sudah mengirimkannya). Mengubah env runtime saja tidak cukup.
 - Tambahkan `APP_SECRET` dan `DATABASE_URL` melalui `.env` untuk API/worker.
 - Jika reverse proxy berada di host, publish API ke loopback juga atau arahkan proxy melalui jaringan yang sesuai. Jangan membuka API/WAHA ke publik tanpa kebutuhan.
 - Jangan publikasikan port WAHA ke seluruh interface.

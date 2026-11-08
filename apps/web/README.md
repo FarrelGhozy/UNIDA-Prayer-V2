@@ -46,7 +46,7 @@ bun run dev
 ```
 
 Aplikasi web dapat diakses pada [http://localhost:3000](http://localhost:3000).
-Proxy internal ke backend Elysia berjalan melalui rewrites di `next.config.ts` menuju `INTERNAL_API_URL` (default: `http://127.0.0.1:3001`).
+Proxy internal ke backend Elysia berjalan melalui rewrites di `next.config.ts` menuju `INTERNAL_API_URL` (default: `http://127.0.0.1:3511`). Nilai ini dibekukan saat `next build`; image Docker wajib di-build dengan build-arg `INTERNAL_API_URL` yang sesuai.
 
 ## 📦 Build Produksi
 

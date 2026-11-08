@@ -54,5 +54,5 @@ Aturan: logo disediakan pemilik; jangan modifikasi lambang. Kontras teks ≥ 4.5
 
 ## 8.7 API client
 
-- `lib/api-client.ts`: `fetch` ke `NEXT_PUBLIC_API_BASE_URL=/api` (browser) dengan `credentials: include`; SSR pakai `INTERNAL_API_URL=http://api:3001` (lihat `10-devops`). Tangani `{ data, error }` + HTTP status → error map Indonesia.
+- `lib/api-client.ts`: `fetch` ke `NEXT_PUBLIC_API_BASE_URL=/api` (browser) dengan `credentials: include`; SSR pakai `INTERNAL_API_URL=http://api:3511` (lihat `10-devops`). Rewrite `/api` dibekukan saat build — build-arg image web harus `http://api:3511`. Tangani `{ data, error }` + HTTP status → error map Indonesia.
 - Auth cookie HttpOnly (JS tak baca token). Jangan simpan WAHA key/secret di localStorage.

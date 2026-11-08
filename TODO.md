@@ -61,6 +61,7 @@
 - [x] Workflow `build.yml`: PR check-only; push main → push GHCR `ghcr.io/farrelghozy/unida-prayer-v2-web|api` (`latest`+SHA)
 - [x] Pull + `db:migrate` + `db:seed` (awal) + `up -d` di home server; healthcheck; backup WAHA volume + MySQL (terdokumentasi di `docs/10`, `docs/14`, `deploy/compose.yml`)
 - [x] Uji: restart container, recovery worker, test-message pasca-update, rollback SHA
+- [x] Perbaiki proxy `/api` production: `INTERNAL_API_URL` di-bake saat build image web (`build-arg http://api:3511`); port API 3511 + web host 3542 diselaraskan di compose/docs
 
 ## Acceptance MVP (tandai bila lolos uji)
 

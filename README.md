@@ -127,8 +127,8 @@ DATABASE_URL=mysql://unida:password_anda@127.0.0.1:3306/unida_prayer
 ADMIN_DEFAULT_PASSWORD=KataSandiAman123!
 WAHA_BASE_URL=http://127.0.0.1:3008
 WAHA_API_KEY=kunci_rahasia_waha_lokal
-PORT=3001
-INTERNAL_API_URL=http://127.0.0.1:3001
+API_PORT=3511
+INTERNAL_API_URL=http://127.0.0.1:3511
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
@@ -149,7 +149,7 @@ bun run db:seed
 Cukup 2 terminal — `dev:api` sudah menggabungkan API + worker dalam 1 log:
 
 ```bash
-# Terminal 1: Backend API Elysia (port 3001) + Worker Scheduler (1 log gabungan)
+# Terminal 1: Backend API Elysia (port 3511) + Worker Scheduler (1 log gabungan)
 bun run dev:api
 
 # Terminal 2: Frontend Next.js Web (port 3000)
