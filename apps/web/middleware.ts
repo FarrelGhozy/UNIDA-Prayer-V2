@@ -26,12 +26,6 @@ export function isValidSessionTokenStructure(token: string | undefined): boolean
 }
 
 export function middleware(request: NextRequest) {
-	// Mode development lokal (NODE_ENV=development): tanpa login, akses path
-	// admin langsung masuk. Tidak aktif di production (NODE_ENV=production).
-	if (process.env.NODE_ENV === "development") {
-		return NextResponse.next();
-	}
-
 	const rawAdminPath = (
 		process.env.NEXT_PUBLIC_ADMIN_PATH ||
 		process.env.ADMIN_PATH ||
@@ -59,7 +53,13 @@ export function middleware(request: NextRequest) {
 				? `${adminBasePath}/login`
 				: "/login";
 
-	const pathname = request.nextUrl.pathname;
+	const rawPath = request.nextUrl.pathname;
+	const pathname =
+		rawPath.length > 1 && rawPath.endsWith("/")
+			? rawPath.replace(/\/+$/, "")
+			: rawPath;
+
+	const isDev = process.env.NODE_ENV === "development";
 
 	// 1. Jika rute kustom diaktifkan, blokir akses langsung ke "/admin" atau "/login" default
 	if (adminBasePath !== "/admin") {
@@ -82,18 +82,21 @@ export function middleware(request: NextRequest) {
 		return NextResponse.rewrite(new URL("/login", request.url));
 	}
 
-	// 3. Tangani rute admin rahasia (adminBasePath)
+	// 3. Tangani rute admin rahasia (adminBasePath) beserta seluruh subpath-nya
 	if (pathname === adminBasePath || pathname.startsWith(`${adminBasePath}/`)) {
 		const subpath = pathname.slice(adminBasePath.length);
 
-		// Cek session cookie untuk strict login requirement
-		const sessionCookie = request.cookies.get("unida_prayer_session")?.value;
-		if (!isValidSessionTokenStructure(sessionCookie)) {
-			const loginUrl = new URL(loginPath, request.url);
-			return NextResponse.redirect(loginUrl);
+		// Mode development lokal (NODE_ENV=development): bypass login requirement.
+		// Mode production: wajib memiliki session token valid, jika tidak redirect ke loginPath.
+		if (!isDev) {
+			const sessionCookie = request.cookies.get("unida_prayer_session")?.value;
+			if (!isValidSessionTokenStructure(sessionCookie)) {
+				const loginUrl = new URL(loginPath, request.url);
+				return NextResponse.redirect(loginUrl);
+			}
 		}
 
-		// Terautentikasi -> rewrite ke rute internal /admin
+		// Terautentikasi (atau mode dev) -> rewrite ke rute internal /admin
 		const targetInternalPath = subpath ? `/admin${subpath}` : "/admin";
 		return NextResponse.rewrite(new URL(targetInternalPath, request.url));
 	}

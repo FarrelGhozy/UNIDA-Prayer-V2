@@ -28,6 +28,35 @@ const nextConfig: NextConfig = {
 		},
 	},
 	async headers() {
+		const rawAdmin = (process.env.ADMIN_PATH || process.env.NEXT_PUBLIC_ADMIN_PATH || "").trim().replace(/^\/+|\/+$/g, "");
+		const rawLogin = (process.env.LOGIN_PATH || process.env.NEXT_PUBLIC_LOGIN_PATH || "").trim().replace(/^\/+|\/+$/g, "");
+
+		const dynamicHeaders = [];
+		if (rawAdmin && rawAdmin !== "admin") {
+			dynamicHeaders.push(
+				{
+					source: `/${rawAdmin}/:path*`,
+					headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+				},
+				{
+					source: `/${rawAdmin}`,
+					headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+				},
+			);
+		}
+		if (rawLogin && rawLogin !== "login") {
+			dynamicHeaders.push(
+				{
+					source: `/${rawLogin}/:path*`,
+					headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+				},
+				{
+					source: `/${rawLogin}`,
+					headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }],
+				},
+			);
+		}
+
 		return [
 			{
 				source: "/:path*",
@@ -77,6 +106,7 @@ const nextConfig: NextConfig = {
 					},
 				],
 			},
+			...dynamicHeaders,
 		];
 	},
 	// Nilai ini dibekukan saat `next build` ke routes-manifest. Image Docker

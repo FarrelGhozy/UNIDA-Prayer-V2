@@ -7,7 +7,7 @@ import {
 	Mail,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggleSwitch } from "../../components/admin/shared/theme-toggle-switch";
 import { DynamicPrayerBackground } from "../../components/landing/dynamic-prayer-background";
@@ -17,6 +17,7 @@ import { adminRoute } from "../../lib/admin-path";
 
 export default function LoginPage() {
 	const router = useRouter();
+	const pathname = usePathname();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -49,7 +50,7 @@ export default function LoginPage() {
 		});
 
 		if (res.data) {
-			router.push(adminRoute("/"));
+			router.push(adminRoute("/", pathname));
 		} else if (res.error) {
 			setError(res.error.message);
 		}

@@ -21,7 +21,7 @@ import { ThemeToggleSwitch } from "../../components/admin/shared/theme-toggle-sw
 import { DynamicPrayerBackground } from "../../components/landing/dynamic-prayer-background";
 import { UnidaPrayerLogo } from "../../components/shared/unida-prayer-logo";
 import { fetchApi } from "../../lib/api-client";
-import { adminRoute, LOGIN_ROUTE } from "../../lib/admin-path";
+import { adminRoute, getLoginRoute } from "../../lib/admin-path";
 
 interface AdminProfile {
 	id: number;
@@ -68,7 +68,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 			if (res.data) {
 				setAdmin(res.data);
 			} else {
-				router.push(LOGIN_ROUTE);
+				router.push(getLoginRoute(pathname));
 				return;
 			}
 			setAuthChecked(true);
@@ -77,47 +77,47 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 		return () => {
 			cancelled = true;
 		};
-	}, [router]);
+	}, [pathname, router]);
 
 	const handleLogout = async () => {
 		await fetchApi("/api/auth/logout", { method: "POST" });
-		router.push(LOGIN_ROUTE);
+		router.push(getLoginRoute(pathname));
 	};
 
 	const navItems = [
 		{
 			label: "Dashboard Utama",
-			href: adminRoute("/"),
+			href: adminRoute("/", pathname),
 			icon: <LayoutDashboard className="h-4 w-4" />,
 		},
 		{
 			label: "WhatsApp Sesi",
-			href: adminRoute("/whatsapp"),
+			href: adminRoute("/whatsapp", pathname),
 			icon: <Radio className="h-4 w-4" />,
 		},
 		{
 			label: "Grup & Target",
-			href: adminRoute("/targets"),
+			href: adminRoute("/targets", pathname),
 			icon: <Users className="h-4 w-4" />,
 		},
 		{
 			label: "Jadwal & Hisab",
-			href: adminRoute("/prayer"),
+			href: adminRoute("/prayer", pathname),
 			icon: <Calendar className="h-4 w-4" />,
 		},
 		{
 			label: "Riwayat Kirim",
-			href: adminRoute("/messages"),
+			href: adminRoute("/messages", pathname),
 			icon: <MessageSquare className="h-4 w-4" />,
 		},
 		{
 			label: "Konten Hadits",
-			href: adminRoute("/hadits"),
+			href: adminRoute("/hadits", pathname),
 			icon: <BookOpen className="h-4 w-4" />,
 		},
 		{
 			label: "Pengaturan Sistem",
-			href: adminRoute("/settings"),
+			href: adminRoute("/settings", pathname),
 			icon: <Settings className="h-4 w-4" />,
 		},
 	];
@@ -169,7 +169,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 			</div>
 
 			<header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/60 bg-white/70 px-4 py-3 shadow-[0_4px_25px_rgba(0,0,0,0.03)] backdrop-blur-xl transition-colors duration-500 dark:border-white/10 dark:bg-[#071426]/75 dark:shadow-[0_8px_30px_rgba(0,0,0,0.4)] lg:hidden">
-				<UnidaPrayerLogo href={adminRoute("/")} size="xs" showBadge={false} theme={theme} />
+				<UnidaPrayerLogo href={adminRoute("/", pathname)} size="xs" showBadge={false} theme={theme} />
 
 				<div className="flex items-center gap-2">
 					<ThemeToggleSwitch theme={theme} onToggle={toggleTheme} size="sm" />
@@ -200,7 +200,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 					>
 						<div>
 							<div className="flex items-center justify-between border-b border-slate-100 pb-4 dark:border-white/10">
-								<UnidaPrayerLogo href={adminRoute("/")} size="xs" showBadge theme={theme} />
+								<UnidaPrayerLogo href={adminRoute("/", pathname)} size="xs" showBadge theme={theme} />
 								<button
 									type="button"
 									onClick={() => setMobileMenuOpen(false)}
@@ -287,7 +287,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
 			<aside className="hidden w-64 shrink-0 border-r border-slate-200/80 bg-white/80 backdrop-blur-2xl transition-colors duration-500 dark:border-white/10 dark:bg-[#071426]/80 lg:flex lg:flex-col lg:justify-between lg:p-6 h-screen sticky top-0 shadow-sm dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
 				<div>
-					<UnidaPrayerLogo href={adminRoute("/")} size="sm" showBadge theme={theme} />
+					<UnidaPrayerLogo href={adminRoute("/", pathname)} size="sm" showBadge theme={theme} />
 
 					<nav className="mt-8 space-y-1.5">
 						{navItems.map((item) => {

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "bun:test";
-import { adminRoute, ADMIN_BASE_PATH, LOGIN_ROUTE } from "./admin-path";
+import {
+	adminRoute,
+	ADMIN_BASE_PATH,
+	getLoginRoute,
+	LOGIN_ROUTE,
+	resolveAdminBase,
+} from "./admin-path";
 
 describe("admin-path helper", () => {
 	it("menyediakan ADMIN_BASE_PATH dengan fallback /admin", () => {
@@ -27,5 +33,25 @@ describe("admin-path helper", () => {
 		expect(adminRoute("/messages?status=FAILED")).toBe(
 			`${ADMIN_BASE_PATH}/messages?status=FAILED`,
 		);
+	});
+
+	it("resolveAdminBase() mendeteksi base path kustom dari URL browser secara dinamis", () => {
+		expect(resolveAdminBase("/pengurus-siman/whatsapp")).toBe("/pengurus-siman");
+		expect(resolveAdminBase("/pengurus-siman/prayer")).toBe("/pengurus-siman");
+		expect(resolveAdminBase("/pengurus-siman/login")).toBe("/pengurus-siman");
+		expect(resolveAdminBase("/pengurus-siman")).toBe("/pengurus-siman");
+		expect(resolveAdminBase("/admin/messages")).toBe("/admin");
+	});
+
+	it("adminRoute() dengan currentPathname menghasilkan rute subpath sesuai base URL aktif", () => {
+		const current = "/portal-rahasia/whatsapp";
+		expect(adminRoute("/prayer", current)).toBe("/portal-rahasia/prayer");
+		expect(adminRoute("/targets", current)).toBe("/portal-rahasia/targets");
+		expect(adminRoute("/", current)).toBe("/portal-rahasia");
+	});
+
+	it("getLoginRoute() menghasilkan rute login sesuai konteks path admin", () => {
+		expect(getLoginRoute("/portal-rahasia/targets")).toBe("/portal-rahasia/login");
+		expect(getLoginRoute("/admin/targets")).toBe("/login");
 	});
 });

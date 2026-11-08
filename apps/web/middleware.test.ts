@@ -132,7 +132,7 @@ describe("middleware secret admin routing", () => {
 		expect(res.headers.get("x-middleware-rewrite")).toContain("/admin/prayer");
 	});
 
-	it("melewatkan semua cek (tanpa login) bila NODE_ENV=development", () => {
+	it("melewatkan login requirement tapi tetap me-rewrite ke /admin bila NODE_ENV=development", () => {
 		const originalNodeEnv = process.env.NODE_ENV;
 		// NODE_ENV readonly di types Next — set via defineProperty.
 		Object.defineProperty(process.env, "NODE_ENV", {
@@ -143,11 +143,18 @@ describe("middleware secret admin routing", () => {
 		});
 		process.env.NEXT_PUBLIC_ADMIN_PATH = "/pengurus-siman";
 
+		// Tanpa cookie, tetap sukses 200 dan di-rewrite ke /admin internal
 		const req = new NextRequest("http://localhost:3000/pengurus-siman");
 		const res = middleware(req);
 		expect(res.status).toBe(200);
 		expect(res.headers.get("location")).toBeNull();
-		expect(res.headers.get("x-middleware-rewrite")).toBeNull();
+		expect(res.headers.get("x-middleware-rewrite")).toContain("/admin");
+
+		// Subpath kustom juga langsung di-rewrite tanpa login
+		const reqSub = new NextRequest("http://localhost:3000/pengurus-siman/whatsapp");
+		const resSub = middleware(reqSub);
+		expect(resSub.status).toBe(200);
+		expect(resSub.headers.get("x-middleware-rewrite")).toContain("/admin/whatsapp");
 
 		Object.defineProperty(process.env, "NODE_ENV", {
 			value: originalNodeEnv,
@@ -155,6 +162,19 @@ describe("middleware secret admin routing", () => {
 			writable: true,
 			enumerable: true,
 		});
+	});
+
+	it("menormalisasi trailing slash pada path kustom", () => {
+		process.env.NEXT_PUBLIC_ADMIN_PATH = "/pengurus-siman";
+
+		const req = new NextRequest("http://localhost:3000/pengurus-siman/", {
+			headers: {
+				cookie: `unida_prayer_session=${makeTestSessionToken()}`,
+			},
+		});
+		const res = middleware(req);
+		expect(res.status).toBe(200);
+		expect(res.headers.get("x-middleware-rewrite")).toContain("/admin");
 	});
 
 	it("membiarkan rute landing / tanpa intervensi", () => {
