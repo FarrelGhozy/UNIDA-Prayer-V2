@@ -22,6 +22,10 @@ dist/
 out/
 *.tsbuildinfo
 
+# Editor swap files
+*.swp
+*.swo
+
 # OS specific files
 Thumbs.db
 ehthumbs.db
