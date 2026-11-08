@@ -97,7 +97,7 @@ Modul selesai bila **semua** terpenuhi:
 - `bun run test`
 - `bun run build`
 - `bun run db:migrate`
-- `docker compose -f deploy/compose.yml pull && docker compose -f deploy/compose.yml up -d`
+- `docker compose --env-file .env -f deploy/compose.yml pull && docker compose --env-file .env -f deploy/compose.yml up -d`
 
 Nama script final wajib disamakan dengan root `package.json` dan `docs/10-devops-cicd.md`. Bila belum ada, jangan mengarang — catat sebagai blocker.
 

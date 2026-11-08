@@ -54,6 +54,7 @@ Aturan:
 - WAHA jangan `ports` ke publik. API publish ke loopback / lewat proxy internal saja.
 - Reverse proxy/TLS ditunda (keputusan pemilik) — untuk sekarang cukup loopback.
 - Tambah `healthcheck` API via `/api/health|/ready`.
+- Jalankan Compose dengan `--env-file .env` dari root repo agar substitusi `${...}` (kredensial WAHA, path admin/login) memakai `.env` yang sama dengan `env_file` container.
 - `.env` prod di server saja (lihat §10.3).
 
 ## 10.2 Image (2 image)
@@ -103,11 +104,11 @@ Update:
 
 ```bash
 cd /path/to/unida-prayer
-docker compose -f deploy/compose.yml pull
-docker compose -f deploy/compose.yml run --rm api bun run db:migrate
-docker compose -f deploy/compose.yml up -d
-docker compose -f deploy/compose.yml ps
-docker compose -f deploy/compose.yml logs -f --tail=100 api worker web waha
+docker compose --env-file .env -f deploy/compose.yml pull
+docker compose --env-file .env -f deploy/compose.yml run --rm api bun run db:migrate
+docker compose --env-file .env -f deploy/compose.yml up -d
+docker compose --env-file .env -f deploy/compose.yml ps
+docker compose --env-file .env -f deploy/compose.yml logs -f --tail=100 api worker web waha
 ```
 
 Rollback app: ganti tag ke SHA lama → `pull` → `up -d`. **Rollback DB tidak otomatis** — migration harus kompatibel; backup dulu bila berisiko.

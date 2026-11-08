@@ -198,13 +198,13 @@ Deploy menggunakan Docker Compose produksi (tanpa MySQL di dalam Compose karena 
 cd /opt/unida-prayer
 
 # 2. Tarik image terbaru dari GHCR
-docker compose -f deploy/compose.yml pull
+docker compose --env-file .env -f deploy/compose.yml pull
 
 # 3. Jalankan migrasi database
 bun run db:migrate
 
 # 4. Restart container secara aman
-docker compose -f deploy/compose.yml up -d
+docker compose --env-file .env -f deploy/compose.yml up -d
 ```
 
 ---

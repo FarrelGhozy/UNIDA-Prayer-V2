@@ -1255,11 +1255,11 @@ Saat ingin mengambil versi terbaru:
 ```bash
 cd /path/to/unida-prayer
 
-docker compose -f deploy/compose.yml pull
+docker compose --env-file .env -f deploy/compose.yml pull
 
-docker compose -f deploy/compose.yml run --rm api bun run db:migrate
+docker compose --env-file .env -f deploy/compose.yml run --rm api bun run db:migrate
 
-docker compose -f deploy/compose.yml up -d
+docker compose --env-file .env -f deploy/compose.yml up -d
 ```
 
 Jika tidak ada migration baru, perintah migration tidak melakukan perubahan schema. Jalankan migration sebelum memperbarui service yang membutuhkan schema baru.
@@ -1267,9 +1267,9 @@ Jika tidak ada migration baru, perintah migration tidak melakukan perubahan sche
 Pemeriksaan setelah update:
 
 ```bash
-docker compose -f deploy/compose.yml ps
+docker compose --env-file .env -f deploy/compose.yml ps
 
-docker compose -f deploy/compose.yml logs -f --tail=100 api worker web waha
+docker compose --env-file .env -f deploy/compose.yml logs -f --tail=100 api worker web waha
 ```
 
 Tidak ada build source code di home server. Home server hanya pull image GHCR dan menjalankan container.
