@@ -1,6 +1,30 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+export function isValidSessionTokenStructure(token: string | undefined): boolean {
+	if (!token) return false;
+	const parts = token.split(".");
+	if (parts.length !== 5) return false;
+	const [adminIdRaw, random, issuedAtRaw, expiresAtRaw, signature] = parts;
+	const adminId = Number.parseInt(adminIdRaw ?? "", 10);
+	const issuedAt = Number.parseInt(issuedAtRaw ?? "", 10);
+	const expiresAt = Number.parseInt(expiresAtRaw ?? "", 10);
+	if (
+		!Number.isSafeInteger(adminId) ||
+		adminId <= 0 ||
+		!Number.isSafeInteger(issuedAt) ||
+		!Number.isSafeInteger(expiresAt) ||
+		!random ||
+		random.length < 10 ||
+		!signature ||
+		signature.length < 32 ||
+		Date.now() > expiresAt
+	) {
+		return false;
+	}
+	return true;
+}
+
 export function middleware(request: NextRequest) {
 	// Mode development lokal (NODE_ENV=development): tanpa login, akses path
 	// admin langsung masuk. Tidak aktif di production (NODE_ENV=production).
@@ -52,7 +76,7 @@ export function middleware(request: NextRequest) {
 	// 2. Tangani rute login rahasia (loginPath)
 	if (pathname === loginPath) {
 		const sessionCookie = request.cookies.get("unida_prayer_session")?.value;
-		if (sessionCookie) {
+		if (isValidSessionTokenStructure(sessionCookie)) {
 			return NextResponse.redirect(new URL(adminBasePath, request.url));
 		}
 		return NextResponse.rewrite(new URL("/login", request.url));
@@ -64,7 +88,7 @@ export function middleware(request: NextRequest) {
 
 		// Cek session cookie untuk strict login requirement
 		const sessionCookie = request.cookies.get("unida_prayer_session")?.value;
-		if (!sessionCookie) {
+		if (!isValidSessionTokenStructure(sessionCookie)) {
 			const loginUrl = new URL(loginPath, request.url);
 			return NextResponse.redirect(loginUrl);
 		}

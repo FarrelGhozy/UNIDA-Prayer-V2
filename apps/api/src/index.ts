@@ -16,7 +16,16 @@ import { whatsappRoutes } from "./modules/whatsapp/routes";
 
 const logger = createLogger("api");
 
-const app = new Elysia()
+const app = new Elysia({
+	serve: {
+		maxRequestBodySize: 2 * 1024 * 1024,
+	},
+})
+	.onRequest(({ set }) => {
+		set.headers["x-frame-options"] = "DENY";
+		set.headers["x-content-type-options"] = "nosniff";
+		set.headers["referrer-policy"] = "strict-origin-when-cross-origin";
+	})
 	// Mode development (localhost): CORS dibuka (origin apa pun) agar frontend
 	// dev tidak terhambat. Production: hanya allowlist config.corsOrigins.
 	.use(

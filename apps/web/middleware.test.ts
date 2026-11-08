@@ -2,6 +2,15 @@ import { describe, expect, it } from "bun:test";
 import { NextRequest } from "next/server";
 import { middleware } from "./middleware";
 
+function makeTestSessionToken(expiresAtOffsetMs = 86400000): string {
+	const adminId = 1;
+	const random = "a1b2c3d4e5f6g7h8";
+	const issuedAt = Date.now();
+	const expiresAt = issuedAt + expiresAtOffsetMs;
+	const sig = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef";
+	return `${adminId}.${random}.${issuedAt}.${expiresAt}.${sig}`;
+}
+
 describe("middleware secret admin routing", () => {
 	const originalAdminPath = process.env.NEXT_PUBLIC_ADMIN_PATH;
 
@@ -34,16 +43,40 @@ describe("middleware secret admin routing", () => {
 		expect(res.headers.get("location")).toContain("/pengurus-siman/login");
 	});
 
-	it("me-rewrite kustom path ke /admin jika sudah ada session cookie", () => {
+	it("me-rewrite kustom path ke /admin jika sudah ada session cookie valid", () => {
 		process.env.NEXT_PUBLIC_ADMIN_PATH = "/pengurus-siman";
 
 		const req = new NextRequest("http://localhost:3000/pengurus-siman", {
 			headers: {
-				cookie: "unida_prayer_session=valid-session-token",
+				cookie: `unida_prayer_session=${makeTestSessionToken()}`,
 			},
 		});
 		const res = middleware(req);
 		expect(res.headers.get("x-middleware-rewrite")).toContain("/admin");
+	});
+
+	it("me-redirect kustom path ke login jika session cookie malformed atau expired", () => {
+		process.env.NEXT_PUBLIC_ADMIN_PATH = "/pengurus-siman";
+
+		// 1. Cookie malformed / dummy asal
+		const reqMalformed = new NextRequest("http://localhost:3000/pengurus-siman", {
+			headers: {
+				cookie: "unida_prayer_session=dummy-asal",
+			},
+		});
+		const resMalformed = middleware(reqMalformed);
+		expect(resMalformed.status).toBe(307);
+		expect(resMalformed.headers.get("location")).toContain("/pengurus-siman/login");
+
+		// 2. Cookie expired
+		const reqExpired = new NextRequest("http://localhost:3000/pengurus-siman", {
+			headers: {
+				cookie: `unida_prayer_session=${makeTestSessionToken(-5000)}`,
+			},
+		});
+		const resExpired = middleware(reqExpired);
+		expect(resExpired.status).toBe(307);
+		expect(resExpired.headers.get("location")).toContain("/pengurus-siman/login");
 	});
 
 	it("mendukung kustom NEXT_PUBLIC_LOGIN_PATH yang terpisah dari admin path", () => {
@@ -73,7 +106,7 @@ describe("middleware secret admin routing", () => {
 
 		const req = new NextRequest("http://localhost:3000/pengurus-siman/prayer", {
 			headers: {
-				cookie: "unida_prayer_session=valid-session-token",
+				cookie: `unida_prayer_session=${makeTestSessionToken()}`,
 			},
 		});
 		const res = middleware(req);
