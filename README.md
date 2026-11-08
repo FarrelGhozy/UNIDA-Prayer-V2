@@ -201,11 +201,17 @@ cd /opt/unida-prayer
 docker compose --env-file .env -f deploy/compose.yml pull
 
 # 3. Jalankan migrasi database
-bun run db:migrate
+docker compose --env-file .env -f deploy/compose.yml run --rm api bun run db:migrate
 
 # 4. Restart container secara aman
 docker compose --env-file .env -f deploy/compose.yml up -d
+
+# 5. Cek kesehatan
+curl -sS http://127.0.0.1:3542/api/health
+curl -sS http://127.0.0.1:3542/api/ready
 ```
+
+Jika MySQL native di host yang sama, `deploy/compose.yml` sudah memount `/var/run/mysqld`; pastikan `DATABASE_URL` memakai `?socketPath=/var/run/mysqld/mysqld.sock` (lihat `docs/14-panduan-mysql.md` §14.3.1).
 
 ---
 

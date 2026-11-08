@@ -29,7 +29,7 @@ FLUSH PRIVILEGES;
 
 Catatan:
 - Ganti `'GANTI_PASSWORD_KUAT'` dengan password acak panjang. Bila password memuat karakter khusus (`@`, `/`, `#`, `?`), encode saat dipakai di `DATABASE_URL` (lihat §14.3) atau pakai password alfanumerik panjang.
-- `'%'` mengizinkan koneksi dari container/host lain. Bila MySQL dan aplikasi satu host dan ingin ketat, ganti `'%'` dengan host spesifik (mis. `'localhost'` untuk dev Fedora).
+- `'%'` mengizinkan koneksi dari container/host lain. Bila MySQL dan aplikasi satu host, gunakan Unix socket (lihat §14.3.1) dan user `'localhost'`; tidak perlu `'%'`.
 - Jangan berikan `ALL PRIVILEGES` / `SUPER` / akses ke schema `mysql.*`.
 
 ## 14.3 `DATABASE_URL`
@@ -42,6 +42,28 @@ DATABASE_URL=mysql://unida_prayer:GANTI_PASSWORD_KUAT@DB_HOST:3306/unida_prayer
 - Prod (home server): `DB_HOST` = alamat MySQL yang dikelola pemilik (bisa `127.0.0.1` bila satu host, atau IP/hostname internal bila terpisah).
 - Contoh password dengan karakter khusus (`p@ss/w#rd` → `p%40ss%2Fw%23rd`):
   `mysql://unida_prayer:p%40ss%2Fw%23rd@127.0.0.1:3306/unida_prayer`
+
+### 14.3.1 MySQL native di host yang sama (container Compose)
+
+Di dalam container, `localhost:3306` menunjuk ke container itu sendiri, bukan host. Jika MySQL native berjalan di host yang sama, mount socket MySQL ke `api`/`worker`:
+
+```yaml
+services:
+  api:
+    volumes:
+      - /var/run/mysqld:/var/run/mysqld
+  worker:
+    volumes:
+      - /var/run/mysqld:/var/run/mysqld
+```
+
+Lalu gunakan:
+
+```env
+DATABASE_URL=mysql://unida_prayer:PASSWORD@localhost/unida_prayer?socketPath=/var/run/mysqld/mysqld.sock
+```
+
+Dengan cara ini MySQL tetap listen `127.0.0.1:3306`, user cukup `unida_prayer@localhost`, dan port 3306 tidak perlu dibuka ke jaringan.
 
 ## 14.4 Verifikasi koneksi
 

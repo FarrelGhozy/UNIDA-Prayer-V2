@@ -1185,6 +1185,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    volumes:
+      - /var/run/mysqld:/var/run/mysqld
     expose:
       - "3511"
     depends_on:
@@ -1196,6 +1198,8 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    volumes:
+      - /var/run/mysqld:/var/run/mysqld
     depends_on:
       - waha
 
@@ -1219,6 +1223,7 @@ Catatan untuk implementasi Compose:
 - Ganti `OWNER` dan `PINNED_VERSION` dengan nilai aktual.
 - Pastikan port dan variabel environment sesuai versi WAHA yang digunakan.
 - Rewrite `/api` di Next.js dibekukan saat `next build`; build image web dengan `--build-arg INTERNAL_API_URL=http://api:3511` (CI sudah mengirimkannya). Mengubah env runtime saja tidak cukup.
+- Jika MySQL native di host yang sama, mount `/var/run/mysqld` ke `api`/`worker` dan pakai `DATABASE_URL=...@localhost/<db>?socketPath=/var/run/mysqld/mysqld.sock`; MySQL tetap bind `127.0.0.1`.
 - Tambahkan `APP_SECRET` dan `DATABASE_URL` melalui `.env` untuk API/worker.
 - Jika reverse proxy berada di host, publish API ke loopback juga atau arahkan proxy melalui jaringan yang sesuai. Jangan membuka API/WAHA ke publik tanpa kebutuhan.
 - Jangan publikasikan port WAHA ke seluruh interface.
