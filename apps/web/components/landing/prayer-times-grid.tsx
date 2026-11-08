@@ -86,7 +86,7 @@ _UNIDA Prayer System V2.0_`;
 						className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200/90 bg-blue-50/70 px-2.5 py-1.5 text-xs font-semibold text-[#1D5FA7] hover:bg-blue-100/70 transition disabled:opacity-50"
 					>
 						<RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
-						<span>Segarkan</span>
+						<span>Perbarui</span>
 					</button>
 				</div>
 			</div>

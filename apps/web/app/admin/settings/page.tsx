@@ -179,7 +179,7 @@ export default function AdminSettingsPage() {
 					className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-[#102A46] shadow-2xs hover:bg-slate-50 transition"
 				>
 					<RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
-					<span>Segarkan Status</span>
+					<span>Perbarui Status</span>
 				</button>
 			</AdminPageHeader>
 
