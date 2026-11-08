@@ -4,14 +4,15 @@ services:
     restart: unless-stopped
     environment:
       NODE_ENV: production
-      INTERNAL_API_URL: http://api:3001
+      # Untuk SSR. Rewrite /api dibekukan saat build (lihat web.Dockerfile).
+      INTERNAL_API_URL: http://api:3511
       NEXT_PUBLIC_API_BASE_URL: /api
       ADMIN_PATH: ${ADMIN_PATH:-/admin}
       LOGIN_PATH: ${LOGIN_PATH:-/login}
       NEXT_PUBLIC_ADMIN_PATH: ${NEXT_PUBLIC_ADMIN_PATH:-/admin}
       NEXT_PUBLIC_LOGIN_PATH: ${NEXT_PUBLIC_LOGIN_PATH:-/login}
     ports:
-      - "127.0.0.1:3000:3000"
+      - "127.0.0.1:3542:3000"
     networks:
       - frontend_net
     depends_on:
@@ -23,14 +24,14 @@ services:
     env_file:
       - ../.env
     expose:
-      - "3001"
+      - "3511"
     networks:
       - frontend_net
       - backend_net
     depends_on:
       - waha
     healthcheck:
-      test: ["CMD-SHELL", "bun -e 'const r = await fetch(\"http://localhost:3001/api/ready\"); if (!r.ok) process.exit(1)'"]
+      test: ["CMD-SHELL", "bun -e 'const r = await fetch(\"http://localhost:3511/api/ready\"); if (!r.ok) process.exit(1)'"]
       interval: 30s
       timeout: 10s
       retries: 3

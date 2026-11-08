@@ -100,7 +100,7 @@ export const config: AppConfig = {
 	// Bypass auth + CORS longgar HANYA bila NODE_ENV bukan production.
 	// Image Docker memaksa NODE_ENV=production sehingga bypass mati otomatis di server.
 	isDev: nodeEnv !== "production",
-	port: port("API_PORT", 3001),
+	port: port("API_PORT", 3511),
 	appSecret: validateAppSecret(nodeEnv === "production"),
 	databaseUrl: required("DATABASE_URL"),
 	wahaBaseUrl: optional("WAHA_BASE_URL", "http://localhost:3000"),

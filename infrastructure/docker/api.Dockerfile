@@ -16,5 +16,5 @@ RUN chown -R bun:bun /app
 USER bun
 WORKDIR /app/apps/api
 ENV NODE_ENV=production
-EXPOSE 3001
+EXPOSE 3511
 CMD ["bun", "run", "src/index.ts"]
