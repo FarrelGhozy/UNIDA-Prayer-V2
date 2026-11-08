@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { CalendarBanner } from "../components/landing/calendar-banner";
 import { DynamicPrayerBackground } from "../components/landing/dynamic-prayer-background";
 import { ErrorState } from "../components/landing/error-state";
 import { Footer } from "../components/landing/footer";
@@ -174,12 +173,6 @@ export default function HomePage() {
 
 			<main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8">
 				<div className="mx-auto max-w-5xl space-y-6 sm:space-y-8">
-					<CalendarBanner
-						locationName={data?.locationName ?? "UNIDA Gontor"}
-						gregorianDateFormatted={gregorianDateFormatted}
-						hijri={data?.hijri}
-					/>
-
 					{loading && <SkeletonLoading />}
 
 					{error && !loading && (
@@ -195,6 +188,9 @@ export default function HomePage() {
 							<NextPrayerHero
 								nextPrayer={data.nextPrayer}
 								countdown={countdown}
+								locationName={data.locationName ?? "UNIDA Gontor"}
+								gregorianDateFormatted={gregorianDateFormatted}
+								hijri={data.hijri}
 							/>
 
 							<PrayerTimesGrid
