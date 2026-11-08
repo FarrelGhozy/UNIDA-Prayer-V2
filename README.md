@@ -67,7 +67,7 @@ Sistem ini memadukan **Landing Page Publik** berdesain modern, **Dashboard Admin
 Dibangun dengan **Bun Workspace** dan TypeScript strict:
 
 ```text
-vibin_01_prayer_WhatsApp_bot/
+UNIDA-Prayer-V2/
 ├── apps/
 │   ├── web/                    # Frontend Next.js 16 (Turbopack, Tailwind CSS v4, Lucide)
 │   │   ├── app/                # App Router: landing publik (/), login (/login), admin (/admin/*)
@@ -107,8 +107,8 @@ vibin_01_prayer_WhatsApp_bot/
 ### 2. Kloning & Instal Dependensi
 
 ```bash
-git clone https://github.com/FarrelGhozy/vibin_01_prayer_WhatsApp_bot.git
-cd vibin_01_prayer_WhatsApp_bot
+git clone https://github.com/FarrelGhozy/UNIDA-Prayer-V2.git
+cd UNIDA-Prayer-V2
 bun install --frozen-lockfile
 ```
 
@@ -224,6 +224,17 @@ Dokumentasi lengkap dan spesifikasi arsitektur tersedia di direktori [`docs/`](d
 9. [`docs/10-devops-cicd.md`](docs/10-devops-cicd.md) — Strategi CI/CD GitHub Actions & deployment home server
 10. [`docs/14-panduan-mysql.md`](docs/14-panduan-mysql.md) — Panduan provisioning user & database MySQL
 11. [`docs/15-pembekuan-template-hadits.md`](docs/15-pembekuan-template-hadits.md) — Format template WhatsApp & daftar hadits/ayat
+
+---
+
+## 🙏 Atribusi & Asal-Usul
+
+Proyek ini **dikembangkan mandiri dari awal (rewrite total)** dan **bukan fork**.
+
+Sebagai patokan awal sebelum dirombak total, pengembangan sempat merujuk pada:
+- https://github.com/Zizarinr/vibin_01_prayer_WhatsApp_bot
+
+Seluruh arsitektur V2 saat ini — monorepo TypeScript Bun Workspace (Next.js + Elysia + worker MySQL-backed + WAHA GoWS), skema database, scheduler idempoten, dashboard admin, dan dokumentasi `docs/` — ditulis ulang dari nol untuk kebutuhan internal UNIDA Gontor Kampus Siman.
 
 ---
 
