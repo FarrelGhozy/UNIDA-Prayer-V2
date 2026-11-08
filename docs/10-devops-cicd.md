@@ -76,7 +76,8 @@ Dockerfile wajib: dukung Bun Workspace, copy hasil build benar, non-root bila me
 ```env
 NODE_ENV=production
 APP_SECRET=replace-with-long-random-secret
-WEB_URL=https://prayer.example.ac.id
+WEB_URL=https://prayer.utc.web.id
+NEXT_PUBLIC_APP_URL=https://prayer.utc.web.id
 API_PORT=3511
 # MySQL terpisah:
 DATABASE_URL=mysql://unida_prayer:CHANGE_ME@DB_HOST:3306/unida_prayer

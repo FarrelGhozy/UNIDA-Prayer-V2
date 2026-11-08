@@ -11,7 +11,7 @@
 - Q-OWNER-01 → OWNER **`FarrelGhozy`** (image `ghcr.io/FarrelGhozy/unida-prayer-web|api`). Visibilitas package: **public** (diputuskan 4 Nov 2026).
 - Q-WAHA-01 → Pin **`devlikeapro/waha:gows-2026.10.1`** (tag GoWS terbaru saat cek 4 Nov 2026; engine `GOWS` via env juga). Dilarang tag `latest`. Bila ada rilis stabil lebih baru saat Fase 3, putuskan ulang dan catat di `docs/07-waha-integration.md`.
 - Q-DB-01 → MySQL eksternal **port standar 3306**, provisioning oleh pemilik. Panduan di `docs/14-panduan-mysql.md`. Dev Fedora pakai MySQL lokal (panduan sama).
-- Q-OPS-01 → **Ditunda** (bukan domain resmi institusi). Compose di repo ini **khusus production**; development jalan native (Bun/Next + MySQL lokal) tanpa Compose dev. Catatan: Docker tidak menggantikan reverse proxy — saat domain ada, putuskan publish langsung vs proxy (lihat `docs/10-devops-cicd.md`).
+- Q-OPS-01 → Domain final: **`https://prayer.utc.web.id/`** (diputuskan pemilik 9 Nov 2026). Web metadata, OpenGraph, sitemap, dan robots diselaraskan ke domain ini. Reverse proxy host mengarahkan traffic publik `prayer.utc.web.id` (port 443/TLS) ke loopback container web `127.0.0.1:3542`.
 - Perubahan rancangan (pemilik): **hadits masuk database + CRUD admin**. `data/hadiths.json` menjadi **seed awal** bersama akun admin utama. Tabel `hadiths` ditambah (lihat `docs/03-database.md`); template pesan tetap di TypeScript untuk MVP.
 
 ## BLOCKER
