@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { DynamicPrayerBackground } from "../components/landing/dynamic-prayer-background";
 import { ErrorState } from "../components/landing/error-state";
 import { Footer } from "../components/landing/footer";
@@ -20,6 +20,20 @@ import type {
 	WeeklyPrayerResponse,
 } from "../types/prayer";
 
+function getLocalDateString(timeMs: number, timeZone = "Asia/Jakarta"): string {
+	try {
+		return new Intl.DateTimeFormat("en-CA", {
+			timeZone,
+			year: "numeric",
+			month: "2-digit",
+			day: "2-digit",
+		}).format(new Date(timeMs));
+	} catch {
+		const d = new Date(timeMs);
+		return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+	}
+}
+
 export default function HomePage() {
 	const [data, setData] = useState<TodayPrayerData | null>(null);
 	const [weeklyDays, setWeeklyDays] = useState<WeeklyPrayerDay[] | null>(null);
@@ -30,44 +44,82 @@ export default function HomePage() {
 	const [serverSkewMs, setServerSkewMs] = useState(0);
 	const [now, setNow] = useState<number | null>(null);
 
+	const dataRef = useRef<TodayPrayerData | null>(null);
+	const isFetchingRef = useRef<boolean>(false);
+	const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+	const lastAdvanceKeyRef = useRef<string>("");
+
 	const loadPrayerData = useCallback(async (isRefresh = false) => {
+		if (isFetchingRef.current) return;
+		isFetchingRef.current = true;
+
 		if (isRefresh) {
 			setRefreshing(true);
 		} else {
 			setLoading(true);
 		}
-		setError(null);
 
-		const clientFetchStart = Date.now();
-		const [resToday, resWeek] = await Promise.all([
-			fetchApi<TodayPrayerData>("/api/public/prayer/today"),
-			fetchApi<WeeklyPrayerResponse>("/api/public/prayer/week"),
-		]);
-
-		if (resToday.error || !resToday.data) {
-			setError(
-				resToday.error?.message ||
-					"Jadwal shalat belum dapat dimuat dari server backend.",
-			);
-			setData(null);
-		} else {
-			const serverTime = new Date(resToday.data.serverNowUtc).getTime();
-			const latency = (Date.now() - clientFetchStart) / 2;
-			setServerSkewMs(serverTime + latency - Date.now());
-			setData(resToday.data);
+		if (retryTimeoutRef.current) {
+			clearTimeout(retryTimeoutRef.current);
+			retryTimeoutRef.current = null;
 		}
 
-		if (resWeek.data?.days) {
-			setWeeklyDays(resWeek.data.days);
-		}
+		try {
+			const clientFetchStart = Date.now();
+			const [resToday, resWeek] = await Promise.all([
+				fetchApi<TodayPrayerData>("/api/public/prayer/today"),
+				fetchApi<WeeklyPrayerResponse>("/api/public/prayer/week"),
+			]);
 
-		setLoading(false);
-		setRefreshing(false);
+			if (resToday.error || !resToday.data) {
+				// Bila data belum pernah ada sama sekali, tampilkan error state
+				if (!dataRef.current) {
+					setError(
+						resToday.error?.message ||
+							"Jadwal shalat belum dapat dimuat dari server backend.",
+					);
+					setData(null);
+				}
+				// Stale-While-Revalidate: bila sebelumnya sudah ada data, jangan hapus data dari layar.
+				// Jadwalkan auto-retry otomatis 10 detik kemudian agar display tidak macet.
+				retryTimeoutRef.current = setTimeout(() => {
+					loadPrayerData(true);
+				}, 10000);
+			} else {
+				const serverTime = new Date(resToday.data.serverNowUtc).getTime();
+				const latency = (Date.now() - clientFetchStart) / 2;
+				setServerSkewMs(serverTime + latency - Date.now());
+				setData(resToday.data);
+				dataRef.current = resToday.data;
+				setError(null);
+			}
+
+			if (resWeek.data?.days) {
+				setWeeklyDays(resWeek.data.days);
+			}
+		} catch {
+			if (!dataRef.current) {
+				setError("Terjadi kendala saat menghubungi server.");
+			}
+			retryTimeoutRef.current = setTimeout(() => {
+				loadPrayerData(true);
+			}, 10000);
+		} finally {
+			setLoading(false);
+			setRefreshing(false);
+			isFetchingRef.current = false;
+		}
 	}, []);
 
 	useEffect(() => {
 		setNow(Date.now());
 		loadPrayerData();
+
+		return () => {
+			if (retryTimeoutRef.current) {
+				clearTimeout(retryTimeoutRef.current);
+			}
+		};
 	}, [loadPrayerData]);
 
 	useEffect(() => {
@@ -76,6 +128,46 @@ export default function HomePage() {
 		}, 1000);
 		return () => clearInterval(timer);
 	}, []);
+
+	// Sinkronisasi saat tab bangun dari mode tidur/hibernasi (visibility change / window focus)
+	useEffect(() => {
+		const handleVisibilityOrFocus = () => {
+			if (document.visibilityState === "visible") {
+				const current = Date.now();
+				setNow(current);
+
+				const currentData = dataRef.current;
+				if (!currentData || isFetchingRef.current) return;
+
+				const currentServerTime = current + serverSkewMs;
+				const todayDateLocal = getLocalDateString(
+					currentServerTime,
+					currentData.timezone || "Asia/Jakarta",
+				);
+				const isDayChanged =
+					currentData.dateLocal && todayDateLocal !== currentData.dateLocal;
+
+				const nextPrayerUtc = currentData.nextPrayer?.scheduledAtUtc;
+				const targetUtc = nextPrayerUtc
+					? new Date(nextPrayerUtc).getTime()
+					: null;
+				const isPrayerTimeArrived =
+					targetUtc !== null && currentServerTime >= targetUtc;
+
+				if (isDayChanged || isPrayerTimeArrived) {
+					loadPrayerData(true);
+				}
+			}
+		};
+
+		document.addEventListener("visibilitychange", handleVisibilityOrFocus);
+		window.addEventListener("focus", handleVisibilityOrFocus);
+
+		return () => {
+			document.removeEventListener("visibilitychange", handleVisibilityOrFocus);
+			window.removeEventListener("focus", handleVisibilityOrFocus);
+		};
+	}, [serverSkewMs, loadPrayerData]);
 
 	const [paramTheme, setParamTheme] = useState<"light" | "dark" | null>(null);
 	const [paramPhase, setParamPhase] = useState<string | null>(null);
@@ -109,16 +201,35 @@ export default function HomePage() {
 
 	const theme: "light" | "dark" = paramTheme || (isDaytime ? "light" : "dark");
 
-	// Countdown auto-advance: jika waktu tiba (00), langsung muat waktu shalat berikutnya
-	const nextPrayerUtc = data?.nextPrayer?.scheduledAtUtc;
+	// Auto-advance jadwal shalat & pergantian hari (Midnight 00:00:00 Rollover):
+	// Memastikan halaman tetap akurat dan tidak stuck/freeze bila dibiarkan menyala berhari-hari.
 	useEffect(() => {
-		if (!now || !nextPrayerUtc) return;
-		const targetUtc = new Date(nextPrayerUtc).getTime();
+		if (!now || !data) return;
 		const currentServerTime = now + serverSkewMs;
-		if (currentServerTime >= targetUtc) {
-			loadPrayerData(true);
+		const todayDateLocal = getLocalDateString(
+			currentServerTime,
+			data.timezone || "Asia/Jakarta",
+		);
+
+		// 1. Deteksi pergantian hari kalender
+		const isDayChanged = data.dateLocal && todayDateLocal !== data.dateLocal;
+
+		// 2. Deteksi waktu shalat berikutnya tiba
+		const nextPrayerUtc = data.nextPrayer?.scheduledAtUtc;
+		const targetUtc = nextPrayerUtc
+			? new Date(nextPrayerUtc).getTime()
+			: null;
+		const isPrayerTimeArrived =
+			targetUtc !== null && currentServerTime >= targetUtc;
+
+		if (isDayChanged || isPrayerTimeArrived) {
+			const eventKey = `${todayDateLocal}:${nextPrayerUtc ?? ""}`;
+			if (lastAdvanceKeyRef.current !== eventKey && !isFetchingRef.current) {
+				lastAdvanceKeyRef.current = eventKey;
+				loadPrayerData(true);
+			}
 		}
-	}, [now, nextPrayerUtc, serverSkewMs, loadPrayerData]);
+	}, [now, data, serverSkewMs, loadPrayerData]);
 
 	const countdown = useMemo(() => {
 		if (!now || !data?.nextPrayer?.scheduledAtUtc) return null;
