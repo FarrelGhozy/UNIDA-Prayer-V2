@@ -32,7 +32,13 @@ describe("apps/api/integrations/waha", () => {
 
 	it("mengirim payload dengan linkPreview: true secara default", async () => {
 		const originalFetch = globalThis.fetch;
-		let capturedBody: { linkPreview?: boolean; chatId?: string } | undefined;
+		let capturedBody:
+			| {
+					linkPreview?: boolean;
+					linkPreviewHighQuality?: boolean;
+					chatId?: string;
+			  }
+			| undefined;
 		globalThis.fetch = (async (_url: string | URL | Request, init?: RequestInit) => {
 			capturedBody = JSON.parse(init?.body as string);
 			return new Response(JSON.stringify({ id: "msg_123", timestamp: 12345 }), {
@@ -44,10 +50,11 @@ describe("apps/api/integrations/waha", () => {
 		try {
 			const res = await sendTextMessage({
 				chatId: "12036301@g.us",
-				text: "Jadwal: https://prayer.unida.gontor.ac.id",
+				text: "Jadwal: https://prayer.utc.web.id",
 			});
 			expect(res.id).toBe("msg_123");
 			expect(capturedBody?.linkPreview).toBe(true);
+			expect(capturedBody?.linkPreviewHighQuality).toBe(true);
 			expect(capturedBody?.chatId).toBe("12036301@g.us");
 		} finally {
 			globalThis.fetch = originalFetch;

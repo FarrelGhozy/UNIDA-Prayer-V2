@@ -21,13 +21,16 @@ export async function sendTextMessage(
 		textLength: payload.text.length,
 	});
 
+	const linkPreview = payload.linkPreview ?? true;
 	const body: Record<string, unknown> = {
 		session,
 		chatId: payload.chatId,
 		text: payload.text,
-		linkPreview: payload.linkPreview ?? true,
+		linkPreview,
 	};
-	if (payload.linkPreviewHighQuality !== undefined) {
+	if (linkPreview) {
+		body.linkPreviewHighQuality = payload.linkPreviewHighQuality ?? true;
+	} else if (payload.linkPreviewHighQuality !== undefined) {
 		body.linkPreviewHighQuality = payload.linkPreviewHighQuality;
 	}
 

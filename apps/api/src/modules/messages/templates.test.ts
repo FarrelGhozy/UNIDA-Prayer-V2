@@ -22,7 +22,7 @@ describe("messages/templates", () => {
 			hijri: "23 Jumadil Ula 1448 H",
 			gregorian: "Rabu, 4 November 2026",
 			isFriday: false,
-			detailUrl: "https://prayer.unida.gontor.ac.id/",
+			detailUrl: "https://prayer.utc.web.id/",
 			hadith: {
 				id: 1,
 				text: "Sholat paling utama adalah yang tepat pada waktunya.",
@@ -37,7 +37,7 @@ describe("messages/templates", () => {
 		expect(rendered.body).toContain("📖 *Hadith Hari Ini:*");
 		expect(rendered.body).toContain("HR. Bukhari & Muslim");
 		expect(rendered.body).toContain(
-			"🔗 Jadwal lengkap: https://prayer.unida.gontor.ac.id",
+			"🔗 Jadwal lengkap: https://prayer.utc.web.id",
 		);
 		expect(rendered.contentRef).toBe("hadith:1");
 	});
@@ -67,7 +67,7 @@ describe("messages/templates", () => {
 			hijri: "25 Jumadil Ula 1448 H",
 			gregorian: "Jumat, 6 November 2026",
 			isFriday: true,
-			detailUrl: "https://prayer.unida.gontor.ac.id",
+			detailUrl: "https://prayer.utc.web.id",
 			hadith: null,
 		});
 
@@ -110,7 +110,7 @@ describe("messages/templates", () => {
 			gregorian: "Ahad, 1 November 2026",
 			isFriday: false,
 			minutes: 5,
-			detailUrl: "https://prayer.unida.gontor.ac.id/",
+			detailUrl: "https://prayer.utc.web.id/",
 		});
 
 		expect(normal.body).toContain("5 menit");
@@ -119,7 +119,7 @@ describe("messages/templates", () => {
 		expect(normal.body).toContain("23 Jumadil Ula 1448 H");
 		expect(normal.body).toContain("Ahad, 1 November 2026");
 		expect(normal.body).toContain(
-			"🔗 Jadwal lengkap: https://prayer.unida.gontor.ac.id",
+			"🔗 Jadwal lengkap: https://prayer.utc.web.id",
 		);
 
 		const friday = renderPreReminderMessage("DHUHR", 6, {
@@ -148,7 +148,7 @@ describe("messages/templates", () => {
 			hijri: "28 Jumadilawal 1448 H",
 			gregorian: "Ahad, 8 November 2026",
 			isFriday: false,
-			detailUrl: "https://prayer.unida.gontor.ac.id",
+			detailUrl: "https://prayer.utc.web.id",
 			hadith: null,
 		});
 		expect(isStaleTemplateBody(fresh.body)).toBe(false);
