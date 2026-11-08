@@ -203,10 +203,13 @@ docker compose --env-file .env -f deploy/compose.yml pull
 # 3. Jalankan migrasi database
 docker compose --env-file .env -f deploy/compose.yml run --rm api bun run db:migrate
 
-# 4. Restart container secara aman
+# 4. Jalankan seeding database (wajib saat setup pertama kali untuk akun admin & hadits awal, atau untuk update kredensial admin dari .env)
+docker compose --env-file .env -f deploy/compose.yml run --rm api bun run db:seed
+
+# 5. Restart container secara aman
 docker compose --env-file .env -f deploy/compose.yml up -d
 
-# 5. Cek kesehatan
+# 6. Cek kesehatan
 curl -sS http://127.0.0.1:3542/api/health
 curl -sS http://127.0.0.1:3542/api/ready
 ```

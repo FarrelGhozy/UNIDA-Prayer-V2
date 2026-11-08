@@ -111,6 +111,8 @@ Update:
 cd /path/to/unida-prayer
 docker compose --env-file .env -f deploy/compose.yml pull
 docker compose --env-file .env -f deploy/compose.yml run --rm api bun run db:migrate
+# Bila instalasi awal atau memperbarui akun admin / hadits:
+# docker compose --env-file .env -f deploy/compose.yml run --rm api bun run db:seed
 docker compose --env-file .env -f deploy/compose.yml up -d
 docker compose --env-file .env -f deploy/compose.yml ps
 docker compose --env-file .env -f deploy/compose.yml logs -f --tail=100 api worker web waha
