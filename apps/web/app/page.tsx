@@ -12,6 +12,7 @@ import { ValidationNotice } from "../components/landing/validation-notice";
 import { WeeklyPrayerTable } from "../components/landing/weekly-prayer-table";
 import { WhatsappBanner } from "../components/landing/whatsapp-banner";
 import { fetchApi } from "../lib/api-client";
+import { computeSlotStatus } from "../lib/prayer-slot";
 import type {
 	SlotStatus,
 	TodayPrayerData,
@@ -76,6 +77,23 @@ export default function HomePage() {
 		return () => clearInterval(timer);
 	}, []);
 
+	const [paramTheme, setParamTheme] = useState<"light" | "dark" | null>(null);
+	const [paramPhase, setParamPhase] = useState<string | null>(null);
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const searchParams = new URLSearchParams(window.location.search);
+			const t = searchParams.get("theme")?.toLowerCase();
+			if (t === "light" || t === "dark") {
+				setParamTheme(t as "light" | "dark");
+			}
+			const p = searchParams.get("phase")?.toUpperCase();
+			if (p) {
+				setParamPhase(p);
+			}
+		}
+	}, []);
+
 	// Tema otomatis: Terbit s.d. Maghrib = Terang, di luar itu = Gelap
 	const isDaytime = useMemo(() => {
 		if (!now) return false;
@@ -89,7 +107,7 @@ export default function HomePage() {
 		return hour >= 5 && hour < 18;
 	}, [data, now, serverSkewMs]);
 
-	const theme: "light" | "dark" = isDaytime ? "light" : "dark";
+	const theme: "light" | "dark" = paramTheme || (isDaytime ? "light" : "dark");
 
 	// Countdown auto-advance: jika waktu tiba (00), langsung muat waktu shalat berikutnya
 	const nextPrayerUtc = data?.nextPrayer?.scheduledAtUtc;
@@ -143,21 +161,34 @@ export default function HomePage() {
 		});
 	}, [data?.dateLocal]);
 
+	const effectiveServerTime = useMemo(() => {
+		if (paramPhase && data) {
+			switch (paramPhase) {
+				case "SUBUH":
+					return new Date(data.times.FAJR.utc).getTime() + 60000;
+				case "DZUHUR":
+					return new Date(data.times.DHUHR.utc).getTime() + 60000;
+				case "ASHAR":
+					return new Date(data.times.ASR.utc).getTime() + 60000;
+				case "MAGHRIB":
+					return new Date(data.times.MAGHRIB.utc).getTime() + 60000;
+				case "ISHA":
+					return new Date(data.times.ISHA.utc).getTime() + 60000;
+			}
+		}
+		return now !== null ? now + serverSkewMs : null;
+	}, [data, now, paramPhase, serverSkewMs]);
+
 	const getSlotStatus = useCallback(
 		(utcString: string, prayerName: string): SlotStatus => {
-			if (!now || !data) return "UPCOMING";
-			const currentServerTime = now + serverSkewMs;
-			const targetTime = new Date(utcString).getTime();
-
-			if (data.nextPrayer.prayerName === prayerName && !data.nextPrayer.isTomorrow) {
-				return "NEXT";
-			}
-			if (targetTime < currentServerTime) {
-				return "PASSED";
-			}
-			return "UPCOMING";
+			return computeSlotStatus({
+				data,
+				currentServerTime: effectiveServerTime,
+				utcString,
+				prayerName,
+			});
 		},
-		[data, now, serverSkewMs],
+		[data, effectiveServerTime],
 	);
 
 	return (
@@ -168,6 +199,30 @@ export default function HomePage() {
 				serverSkewMs={serverSkewMs}
 				theme={theme}
 			/>
+
+			<div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+				<div
+					className={`absolute -top-32 -right-32 h-[560px] w-[560px] rounded-full blur-[120px] transition-all duration-1000 ${
+						theme === "dark"
+							? "bg-blue-600/25 opacity-70"
+							: "bg-sky-400/25 opacity-75"
+					}`}
+				/>
+				<div
+					className={`absolute top-1/2 -left-44 h-[600px] w-[600px] -translate-y-1/2 rounded-full blur-[130px] transition-all duration-1000 ${
+						theme === "dark"
+							? "bg-emerald-500/15 opacity-60"
+							: "bg-teal-400/20 opacity-70"
+					}`}
+				/>
+				<div
+					className={`absolute -bottom-40 left-1/3 h-[520px] w-[520px] rounded-full blur-[120px] transition-all duration-1000 ${
+						theme === "dark"
+							? "bg-indigo-600/20 opacity-60"
+							: "bg-blue-400/15 opacity-60"
+					}`}
+				/>
+			</div>
 
 			<Header liveTimeString={liveTimeString} theme={theme} />
 

@@ -122,7 +122,7 @@ export default function AdminMessagesPage() {
 					type="button"
 					onClick={() => loadMessages()}
 					disabled={loading}
-					className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-[#102A46] shadow-2xs hover:bg-slate-50 transition"
+					className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-3.5 py-2.5 text-xs font-semibold text-[#102A46] shadow-2xs transition hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
 				>
 					<RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
 					<span>Perbarui</span>
@@ -155,7 +155,7 @@ export default function AdminMessagesPage() {
 				}}
 			/>
 
-			<div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xs">
+			<div className="glass-panel glass-sheen overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-2xs dark:border-white/10 dark:bg-[#0D1C2E]/80">
 				<MessagesTable
 					messages={messages}
 					loading={loading}

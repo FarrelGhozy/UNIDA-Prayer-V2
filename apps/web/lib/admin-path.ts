@@ -1,17 +1,24 @@
 /**
- * Konfigurasi rute path admin dari environment variable.
- * Default fallback adalah "/admin" bila NEXT_PUBLIC_ADMIN_PATH tidak disetel.
+ * Konfigurasi rute path admin dan login dari environment variable.
+ * - NEXT_PUBLIC_ADMIN_PATH: default fallback adalah "/admin"
+ * - NEXT_PUBLIC_LOGIN_PATH: default fallback adalah `${ADMIN_BASE_PATH}/login` (bila admin bukan /admin) atau "/login"
  */
-function normalizeAdminPath(raw: string | undefined): string {
+function normalizePath(raw: string | undefined): string | null {
 	const trimmed = (raw ?? "").trim();
-	if (!trimmed || trimmed === "undefined" || trimmed === "null") return "/admin";
+	if (!trimmed || trimmed === "undefined" || trimmed === "null") return null;
 	const withSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
-	return withSlash.replace(/\/+$/, "") || "/admin";
+	return withSlash.replace(/\/+$/, "") || null;
 }
 
-export const ADMIN_BASE_PATH = normalizeAdminPath(process.env.NEXT_PUBLIC_ADMIN_PATH);
+export const ADMIN_BASE_PATH = normalizePath(process.env.NEXT_PUBLIC_ADMIN_PATH) || "/admin";
 
-export const LOGIN_ROUTE = `${ADMIN_BASE_PATH}/login`;
+const customLogin = normalizePath(process.env.NEXT_PUBLIC_LOGIN_PATH);
+export const LOGIN_ROUTE =
+	customLogin && customLogin !== "/login"
+		? customLogin
+		: ADMIN_BASE_PATH !== "/admin"
+			? `${ADMIN_BASE_PATH}/login`
+			: "/login";
 
 export function adminRoute(path = ""): string {
 	if (!path || path === "/" || path === "") {

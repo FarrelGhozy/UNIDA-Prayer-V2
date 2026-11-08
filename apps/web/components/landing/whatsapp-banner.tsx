@@ -2,10 +2,10 @@ import { Send } from "lucide-react";
 
 export function WhatsappBanner() {
 	return (
-		<div className="rounded-3xl border border-blue-100 bg-white/95 backdrop-blur-md p-6 shadow-sm sm:p-7 dark:border-white/10 dark:bg-[#0D2137]/90">
+		<div className="rounded-3xl glass-panel glass-sheen p-6 sm:p-7 shadow-[0_10px_35px_rgba(16,185,129,0.08)] dark:shadow-[0_15px_35px_rgba(16,185,129,0.15)]">
 			<div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
 				<div className="flex items-start gap-4">
-					<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600 ring-4 ring-emerald-50 dark:bg-emerald-950/60 dark:text-emerald-400 dark:ring-emerald-900/40">
+					<div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-emerald-500/30 bg-emerald-500/15 text-emerald-600 shadow-[0_0_20px_rgba(16,185,129,0.2),inset_0_1px_1px_rgba(255,255,255,0.6)] dark:text-emerald-400 dark:shadow-[0_0_20px_rgba(16,185,129,0.25),inset_0_1px_1px_rgba(255,255,255,0.2)]">
 						<Send className="h-6 w-6" />
 					</div>
 					<div className="space-y-1">
@@ -13,7 +13,7 @@ export function WhatsappBanner() {
 							<h4 className="text-base font-bold text-[#102A46] dark:text-white">
 								Pengingat Otomatis WhatsApp Bot
 							</h4>
-							<span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-400 dark:ring-1 dark:ring-emerald-500/30">
+							<span className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 backdrop-blur-xs dark:text-emerald-300">
 								Aktif
 							</span>
 						</div>
@@ -23,7 +23,11 @@ export function WhatsappBanner() {
 					</div>
 				</div>
 
-				<div className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-50/90 px-4 py-2.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:ring-emerald-500/40">
+				<div className="inline-flex shrink-0 items-center justify-center rounded-xl border border-emerald-500/30 bg-emerald-500/15 px-4 py-2.5 text-xs font-semibold text-emerald-800 shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] backdrop-blur-md dark:text-emerald-300 dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.2)]">
+					<span className="relative mr-2 flex h-2 w-2">
+						<span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+						<span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+					</span>
 					<span>Terkoneksi Grup</span>
 				</div>
 			</div>

@@ -45,7 +45,7 @@ export interface TodayPrayerData {
 	serverNowUtc: string;
 }
 
-export type SlotStatus = "PASSED" | "NEXT" | "UPCOMING";
+export type SlotStatus = "PASSED" | "CURRENT" | "NEXT" | "UPCOMING";
 
 export interface WeeklyPrayerDay {
 	dateLocal: string;

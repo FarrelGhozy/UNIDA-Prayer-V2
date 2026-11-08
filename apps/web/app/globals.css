@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Perbaikan integrasi Leaflet Map dengan Tailwind CSS preflight:
    Tailwind preflight menerapkan max-width: 100% pada img/svg yang merusak
    skala tile dan menyebabkan pin bergeser saat zoom in/out. */
@@ -66,4 +68,131 @@ body {
 /* Tabular figures for countdown and clock numbers */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-8px) scale(1.02); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.04); }
+}
+
+.animate-float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    0 12px 32px -5px rgba(18, 59, 109, 0.08),
+    0 4px 12px -2px rgba(18, 59, 109, 0.04),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 1px 0 rgba(18, 59, 109, 0.02);
+}
+
+:is(.dark) .glass-panel {
+  background: rgba(11, 26, 44, 0.65);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 16px 36px -5px rgba(0, 0, 0, 0.45),
+    0 6px 16px -2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-panel-active {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(234, 242, 251, 0.82) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid rgba(29, 95, 167, 0.65);
+  box-shadow: 
+    0 0 25px rgba(29, 95, 167, 0.22),
+    0 12px 32px -4px rgba(18, 59, 109, 0.15),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+}
+
+:is(.dark) .glass-panel-active {
+  background: linear-gradient(145deg, rgba(20, 59, 102, 0.78) 0%, rgba(13, 38, 68, 0.88) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid rgba(107, 169, 216, 0.65);
+  box-shadow: 
+    0 0 30px rgba(56, 189, 248, 0.28),
+    0 16px 36px -5px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.glass-panel-current {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.96) 0%, rgba(236, 253, 245, 0.90) 100%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1.5px solid rgba(16, 185, 129, 0.75);
+  box-shadow: 
+    0 0 28px rgba(16, 185, 129, 0.25),
+    0 12px 32px -4px rgba(6, 78, 59, 0.14),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 1);
+}
+
+:is(.dark) .glass-panel-current {
+  background: linear-gradient(145deg, rgba(6, 78, 59, 0.55) 0%, rgba(4, 47, 46, 0.75) 100%);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1.5px solid rgba(52, 211, 153, 0.75);
+  box-shadow: 
+    0 0 32px rgba(16, 185, 129, 0.3),
+    0 16px 36px -5px rgba(0, 0, 0, 0.5),
+    inset 0 1px 2px 0 rgba(255, 255, 255, 0.3);
+}
+
+.glass-panel-passed {
+  background: rgba(248, 250, 252, 0.90);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(203, 213, 225, 0.85);
+  box-shadow: 
+    0 4px 16px -2px rgba(18, 59, 109, 0.04),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+:is(.dark) .glass-panel-passed {
+  background: rgba(10, 24, 42, 0.55);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 4px 15px -2px rgba(0, 0, 0, 0.3),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-sheen::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0) 100%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+:is(.dark) .glass-sheen::after {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
 }

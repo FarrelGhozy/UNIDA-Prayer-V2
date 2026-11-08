@@ -13,6 +13,7 @@ export interface DynamicPrayerBackgroundProps {
 	serverSkewMs?: number;
 	overlayClassName?: string;
 	theme?: "light" | "dark";
+	phaseOverride?: PrayerTimePhase;
 }
 
 interface BackgroundVariant {
@@ -103,7 +104,19 @@ export function DynamicPrayerBackground({
 	serverSkewMs: propServerSkewMs,
 	overlayClassName,
 	theme = "light",
+	phaseOverride: propPhaseOverride,
 }: DynamicPrayerBackgroundProps = {}) {
+	const [paramPhase, setParamPhase] = useState<PrayerTimePhase | null>(null);
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const p = new URLSearchParams(window.location.search).get("phase")?.toUpperCase();
+			if (p === "SUBUH" || p === "DZUHUR" || p === "ASHAR" || p === "MAGHRIB" || p === "ISYA") {
+				setParamPhase(p as PrayerTimePhase);
+			}
+		}
+	}, []);
+
 	const [internalNow, setInternalNow] = useState<number | null>(() =>
 		propNow !== undefined ? propNow : null,
 	);
@@ -144,15 +157,17 @@ export function DynamicPrayerBackground({
 	const effectiveSkew =
 		propServerSkewMs !== undefined ? propServerSkewMs : internalSkew;
 
-	const activePhase = useMemo(
+	const calculatedPhase = useMemo(
 		() => getActivePhase(effectiveData, effectiveNow, effectiveSkew),
 		[effectiveData, effectiveNow, effectiveSkew],
 	);
 
+	const activePhase = propPhaseOverride || paramPhase || calculatedPhase;
+
 	const defaultOverlay =
 		theme === "dark"
-			? "bg-linear-to-b from-[#06111D]/65 via-[#0A1B2E]/50 to-[#0A1B2E]/75 backdrop-blur-[1px]"
-			: "bg-linear-to-b from-[#0A1B2E]/55 via-[#102A46]/35 to-[#F5F8FC]/95 backdrop-blur-[2px]";
+			? "bg-linear-to-b from-[#030914]/80 via-[#07172E]/65 to-[#081B34]/85 backdrop-blur-[3px]"
+			: "bg-linear-to-b from-[#06192E]/65 via-[#0D2644]/45 to-[#E8F0F8]/88 backdrop-blur-[5px]";
 
 	return (
 		<aside
@@ -173,7 +188,7 @@ export function DynamicPrayerBackground({
 							alt={variant.alt}
 							fill
 							priority={variant.key === "DZUHUR" || isActive}
-							className="object-cover object-center scale-[1.02] transform-gpu filter brightness-[0.92]"
+							className="object-cover object-center scale-[1.02] transform-gpu filter brightness-[0.95] contrast-[1.02]"
 							sizes="100vw"
 							quality={85}
 						/>
@@ -182,7 +197,7 @@ export function DynamicPrayerBackground({
 			})}
 
 			<div
-				className={`absolute inset-0 z-20 ${
+				className={`absolute inset-0 z-20 transition-all duration-700 ${
 					overlayClassName ?? defaultOverlay
 				}`}
 			/>

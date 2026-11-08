@@ -11,6 +11,9 @@ COPY packages ./packages
 COPY apps/api ./apps/api
 COPY data ./data
 
+RUN chown -R bun:bun /app
+
+USER bun
 WORKDIR /app/apps/api
 ENV NODE_ENV=production
 EXPOSE 3001

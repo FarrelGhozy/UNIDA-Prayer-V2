@@ -189,7 +189,7 @@ export default function AdminHadithsPage() {
 				<button
 					type="button"
 					onClick={handleOpenCreate}
-					className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-3.5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#1D5FA7] transition"
+					className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-3.5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#1D5FA7] dark:bg-[#1D5FA7] dark:hover:bg-[#2A75C6]"
 				>
 					<Plus className="h-4 w-4" />
 					<span>Tambah Hadits / Ayat</span>
@@ -197,8 +197,8 @@ export default function AdminHadithsPage() {
 			</AdminPageHeader>
 
 			{warningZeroActive && (
-				<div className="flex items-center gap-3 rounded-2xl bg-amber-50 border border-amber-200 p-4 text-xs text-amber-900">
-					<AlertTriangle className="h-5 w-5 shrink-0 text-amber-600" />
+				<div className="flex items-center gap-3 rounded-2xl bg-amber-50 border border-amber-200 p-4 text-xs text-amber-900 dark:bg-amber-950/40 dark:border-amber-800/50 dark:text-amber-200">
+					<AlertTriangle className="h-5 w-5 shrink-0 text-amber-600 dark:text-amber-400" />
 					<span className="flex-1 font-medium">
 						<strong>Peringatan Sistem:</strong> Tidak ada hadits aktif saat ini. Pesan pengingat shalat akan tetap dikirim secara normal tanpa kutipan hadits.
 					</span>
@@ -221,7 +221,7 @@ export default function AdminHadithsPage() {
 				}}
 			/>
 
-			<div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xs">
+			<div className="glass-panel glass-sheen overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-2xs dark:border-white/10 dark:bg-[#0D1C2E]/80">
 				<HaditsTable
 					hadiths={hadiths}
 					loading={loading}

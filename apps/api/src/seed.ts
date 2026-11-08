@@ -25,15 +25,28 @@ interface SeedHadith {
 }
 
 async function seedAdmin(): Promise<void> {
-	const email = (argValue("email") ?? process.env.SEED_ADMIN_EMAIL ?? "")
+	const email = (
+		argValue("email") ??
+		process.env.SEED_ADMIN_EMAIL ??
+		process.env.ADMIN_EMAIL ??
+		""
+	)
 		.trim()
 		.toLowerCase();
+
 	const name = (
 		argValue("name") ??
 		process.env.SEED_ADMIN_NAME ??
+		process.env.ADMIN_NAME ??
 		"Administrator"
 	).trim();
-	let password = argValue("password") ?? process.env.SEED_ADMIN_PASSWORD ?? "";
+
+	let password =
+		argValue("password") ??
+		process.env.SEED_ADMIN_PASSWORD ??
+		process.env.ADMIN_PASSWORD ??
+		"";
+
 	let generated = false;
 	if (!password) {
 		password =
@@ -43,29 +56,65 @@ async function seedAdmin(): Promise<void> {
 	}
 	if (!isValidEmail(email)) {
 		throw new Error(
-			"Seed admin butuh email valid: bun run db:seed --email=admin@contoh.ac.id [--name=...] [--password=...]",
+			"Seed admin butuh email valid di .env (SEED_ADMIN_EMAIL) atau argumen CLI (--email=admin@unida.gontor.ac.id)",
 		);
 	}
 	if (name.length < 2)
-		throw new Error("Seed admin butuh --name minimal 2 karakter.");
+		throw new Error("Seed admin butuh nama minimal 2 karakter di .env (SEED_ADMIN_NAME) atau CLI (--name=...).");
 	if (password.length < 12)
-		throw new Error("Seed admin butuh password minimal 12 karakter.");
+		throw new Error("Seed admin butuh password minimal 12 karakter di .env (SEED_ADMIN_PASSWORD) atau CLI (--password=...).");
+
+	const passwordHash = await Bun.password.hash(password, {
+		algorithm: "argon2id",
+	});
 
 	const existing = await db
 		.select({ id: admins.id })
 		.from(admins)
 		.where(eq(admins.email, email));
+
 	if (existing.length > 0) {
-		logger.info("Admin sudah ada, dilewati.", { email });
+		await db
+			.update(admins)
+			.set({
+				name,
+				passwordHash,
+				isActive: true,
+				updatedAt: new Date(),
+			})
+			.where(eq(admins.email, email));
+		logger.info("Admin berhasil diperbarui dari .env/argumen.", { email });
 		return;
 	}
-	const passwordHash = await Bun.password.hash(password, {
-		algorithm: "argon2id",
-	});
+
+	const allAdmins = await db.select({ id: admins.id, email: admins.email }).from(admins);
+	const firstAdmin = allAdmins[0];
+	if (
+		allAdmins.length === 1 &&
+		firstAdmin &&
+		(firstAdmin.email === "admin@unida.local" || firstAdmin.email === "admin@contoh.ac.id")
+	) {
+		await db
+			.update(admins)
+			.set({
+				name,
+				email,
+				passwordHash,
+				isActive: true,
+				updatedAt: new Date(),
+			})
+			.where(eq(admins.id, firstAdmin.id));
+		logger.info("Admin awal berhasil dimigrasikan ke email dan kredensial baru dari .env.", {
+			previousEmail: firstAdmin.email,
+			newEmail: email,
+		});
+		return;
+	}
+
 	await db.insert(admins).values({ name, email, passwordHash, isActive: true });
-	logger.info("Admin dibuat.", { email });
+	logger.info("Admin berhasil dibuat dari .env/argumen.", { email });
 	if (generated) {
-		// Dicetak sekali ke stdout operator. Segera ganti setelah login pertama.
+		// Dicetak sekali ke stdout operator bila password tidak ditentukan di .env atau CLI.
 		console.log(`SEED_ADMIN_PASSWORD=${password}`);
 	}
 }
