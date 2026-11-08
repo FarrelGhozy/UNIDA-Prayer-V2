@@ -49,7 +49,7 @@ export function MetricsGrid({ statusData }: MetricsGridProps) {
 					<Radio className="h-4 w-4 text-[#1D5FA7]" />
 				</div>
 				<div className="mt-3 flex items-baseline justify-between">
-					<WahaStatusBadge status={statusData?.waha.status || "Memuat..."} />
+					<WahaStatusBadge status={statusData?.waha?.status ?? "Memuat..."} />
 					<Link
 						href={adminRoute("/whatsapp")}
 						className="text-[11px] font-semibold text-[#1D5FA7] hover:underline"
@@ -65,9 +65,9 @@ export function MetricsGrid({ statusData }: MetricsGridProps) {
 					<Server className="h-4 w-4 text-[#1D5FA7]" />
 				</div>
 				<div className="mt-3 flex items-baseline justify-between">
-					<WorkerStatusBadge state={statusData?.worker.state || "OFFLINE"} />
+					<WorkerStatusBadge state={statusData?.worker?.state ?? "OFFLINE"} />
 					<span className="text-[10px] font-medium text-slate-500">
-						{statusData?.database.ok ? `DB: ${statusData.database.latencyMs}ms` : "DB Offline"}
+						{statusData?.database?.ok ? `DB: ${statusData.database.latencyMs}ms` : "DB Offline"}
 					</span>
 				</div>
 			</div>
@@ -79,10 +79,10 @@ export function MetricsGrid({ statusData }: MetricsGridProps) {
 				</div>
 				<div className="mt-3 flex items-baseline gap-2">
 					<span className="text-2xl font-extrabold text-[#102A46]">
-						{statusData?.counts.todaySent ?? 0}
+						{statusData?.counts?.todaySent ?? 0}
 					</span>
 					<span className="text-xs text-blue-700 font-semibold">
-						({statusData?.counts.pending ?? 0} antrean)
+						({statusData?.counts?.pending ?? 0} antrean)
 					</span>
 				</div>
 			</div>
@@ -94,10 +94,10 @@ export function MetricsGrid({ statusData }: MetricsGridProps) {
 				</div>
 				<div className="mt-3 flex items-baseline gap-2">
 					<span className="text-2xl font-extrabold text-[#102A46]">
-						{statusData?.counts.activeTargets ?? 0}
+						{statusData?.counts?.activeTargets ?? 0}
 					</span>
 					<span className="text-xs font-medium text-slate-600">
-						aktif dari {statusData?.counts.totalTargets ?? 0} terdaftar
+						aktif dari {statusData?.counts?.totalTargets ?? 0} terdaftar
 					</span>
 				</div>
 			</div>

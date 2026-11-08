@@ -2,7 +2,7 @@ import { UnidaPrayerLogo } from "../shared/unida-prayer-logo";
 
 export function Footer() {
 	return (
-		<footer className="mt-auto border-t border-blue-900/50 bg-linear-to-br from-[#123B6D] via-[#102A46] to-[#0A1B2E] py-8 text-xs text-slate-300">
+		<footer className="relative z-10 mt-auto border-t border-blue-900/50 bg-linear-to-br from-[#123B6D] via-[#102A46] to-[#0A1B2E] py-8 text-xs text-slate-300">
 			<div className="mx-auto max-w-5xl px-4 sm:px-6">
 				<div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
 					<UnidaPrayerLogo href="/" size="sm" variant="full" theme="dark" />
@@ -13,6 +13,9 @@ export function Footer() {
 						</div>
 						<p className="text-[11px] text-slate-400 text-center sm:text-right">
 							© 2026 Universitas Darussalam Gontor • UNIDA Prayer System V2.0
+						</p>
+						<p className="text-[10px] text-slate-400/80 font-medium tracking-wide text-center sm:text-right">
+							Dibuat Oleh FarrelGhozy
 						</p>
 					</div>
 				</div>

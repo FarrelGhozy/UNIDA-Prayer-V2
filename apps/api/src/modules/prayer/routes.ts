@@ -2,11 +2,12 @@ import { fail, ok, type ErrorCode } from "@unida-prayer/shared";
 import { Elysia } from "elysia";
 import { requireAdminAuth } from "../auth/guard";
 import { AuthError } from "../auth/service";
-import { previewBodySchema, todayQuerySchema } from "./schema";
+import { previewBodySchema, todayQuerySchema, weekQuerySchema } from "./schema";
 import {
 	getNextPrayerOnly,
 	getPublicSettings,
 	getTodayPrayer,
+	getWeeklyPrayer,
 	previewPrayerTimes,
 } from "./service";
 
@@ -19,6 +20,16 @@ export const prayerRoutes = new Elysia({ prefix: "/api" })
 		},
 		{
 			query: todayQuerySchema,
+		},
+	)
+	.get(
+		"/public/prayer/week",
+		async ({ query }) => {
+			const data = await getWeeklyPrayer(query.startDate);
+			return ok(data);
+		},
+		{
+			query: weekQuerySchema,
 		},
 	)
 	.get("/public/prayer/next", async () => {

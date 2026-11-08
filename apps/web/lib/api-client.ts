@@ -13,20 +13,37 @@ export interface ApiResponse<T> {
 //   "/api/..." lewat rewrite Next.js di next.config.ts → tidak kena CORS).
 // - NEXT_PUBLIC_API_BASE_URL didukung sebagai alias lama (dipakai deploy/compose.yml).
 // - SSR (server) memakai INTERNAL_API_URL bila keduanya kosong.
-const API_BASE =
-	process.env.NEXT_PUBLIC_API_URL ||
-	process.env.NEXT_PUBLIC_API_BASE_URL ||
-	(typeof window === "undefined"
-		? process.env.INTERNAL_API_URL || "http://127.0.0.1:3001"
-		: "");
+export function resolveApiUrl(endpoint: string): string {
+	if (endpoint.startsWith("http://") || endpoint.startsWith("https://")) {
+		return endpoint;
+	}
+	const base = (
+		process.env.NEXT_PUBLIC_API_URL ||
+		process.env.NEXT_PUBLIC_API_BASE_URL ||
+		(typeof window === "undefined"
+			? process.env.INTERNAL_API_URL || "http://127.0.0.1:3001"
+			: "")
+	).trim();
+
+	const cleanBase = base.replace(/\/+$/, "");
+	const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+	// Bila base adalah relative "/api" dan endpoint sudah berawalan "/api",
+	// jangan menduplikasi menjadi "/api/api/...".
+	if (cleanBase === "/api" && cleanEndpoint.startsWith("/api/")) {
+		return cleanEndpoint;
+	}
+	if (cleanBase.endsWith("/api") && cleanEndpoint.startsWith("/api/")) {
+		return `${cleanBase.slice(0, -4)}${cleanEndpoint}`;
+	}
+	return `${cleanBase}${cleanEndpoint}`;
+}
 
 export async function fetchApi<T>(
 	endpoint: string,
 	options?: RequestInit,
 ): Promise<ApiResponse<T>> {
-	const url = endpoint.startsWith("http")
-		? endpoint
-		: `${API_BASE}${endpoint.startsWith("/") ? "" : "/"}${endpoint}`;
+	const url = resolveApiUrl(endpoint);
 
 	try {
 		const res = await fetch(url, {

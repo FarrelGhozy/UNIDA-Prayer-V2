@@ -1,6 +1,20 @@
 "use client";
 
-import { CalendarClock, Play, Square } from "lucide-react";
+import {
+	AlertCircle,
+	Bell,
+	CalendarClock,
+	CheckCircle2,
+	ChevronDown,
+	ChevronUp,
+	Eye,
+	Play,
+	Send,
+	Sparkles,
+	Square,
+	Volume2,
+	XCircle,
+} from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { fetchApi } from "../../../lib/api-client";
 import type { TestTargetMode } from "./test-message-card";
@@ -58,6 +72,7 @@ export function DayTestCard({ mode, targetId, phone, hasTargets }: DayTestCardPr
 	const [run, setRun] = useState<RunStatus | null>(null);
 	const [runError, setRunError] = useState<string | null>(null);
 	const [cancelling, setCancelling] = useState(false);
+	const [expandedSeqs, setExpandedSeqs] = useState<Record<number, boolean>>({});
 	const pollTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
 	const stopPolling = useCallback(() => {
@@ -73,6 +88,7 @@ export function DayTestCard({ mode, targetId, phone, hasTargets }: DayTestCardPr
 	useEffect(() => {
 		setPreview(null);
 		setPreviewError(null);
+		setExpandedSeqs({});
 	}, [mode, targetId, phone]);
 
 	const handlePreview = async () => {
@@ -90,6 +106,8 @@ export function DayTestCard({ mode, targetId, phone, hasTargets }: DayTestCardPr
 
 		if (res.data) {
 			setPreview(res.data);
+			// Secara default buka 2 pesan pertama untuk preview cepat
+			setExpandedSeqs({ 0: true, 1: true });
 		} else if (res.error) {
 			setPreviewError(res.error.message);
 		}
@@ -158,129 +176,310 @@ export function DayTestCard({ mode, targetId, phone, hasTargets }: DayTestCardPr
 		void pollStatus(run.runId);
 	};
 
+	const toggleExpand = (seq: number) => {
+		setExpandedSeqs((prev) => ({ ...prev, [seq]: !prev[seq] }));
+	};
+
+	const toggleExpandAll = () => {
+		if (!preview) return;
+		const allExpanded = preview.messages.every((m) => expandedSeqs[m.seq]);
+		const next: Record<number, boolean> = {};
+		if (!allExpanded) {
+			preview.messages.forEach((m) => {
+				next[m.seq] = true;
+			});
+		}
+		setExpandedSeqs(next);
+	};
+
 	const canTarget =
 		mode === "PERSONAL" ? phone.trim().length > 0 : targetId !== null && hasTargets;
 	const running = run?.status === "RUNNING";
 	const firstPre = preview?.messages.find((m) => m.messageType === "PRE_REMINDER");
 
 	return (
-		<div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xs space-y-4">
-			<div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-				<CalendarClock className="h-4 w-4 text-[#1D5FA7]" />
-				<h2 className="text-sm font-bold text-[#102A46]">Simulasi Sehari Penuh</h2>
+		<div className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-2xs space-y-5">
+			<div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4">
+				<div className="flex items-center gap-2.5">
+					<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-[#1D5FA7]">
+						<CalendarClock className="h-5 w-5" />
+					</div>
+					<div>
+						<h2 className="text-sm font-bold text-[#102A46] sm:text-base">
+							Simulasi Sehari Penuh (Full-Day Test)
+						</h2>
+						<p className="text-xs text-[#64748B]">
+							Uji pengiriman rangkaian 10 pesan jadwal hari ini (pre-reminder + adzan) dengan jeda acak anti-spam.
+						</p>
+					</div>
+				</div>
+
+				<div className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-xl bg-slate-100 px-3 py-1.5 text-xs font-semibold text-[#102A46]">
+					<span className="text-slate-400">Target:</span>
+					<span>{mode === "GROUP" ? "Grup WhatsApp" : "Nomor Pribadi"}</span>
+				</div>
 			</div>
 
-			<p className="text-xs text-[#64748B]">
-				Kirim seluruh pesan jadwal hari ini (pre-reminder + adzan tiap waktu) persis seperti yang
-				akan keluar, dengan jeda ±3 detik + acak 1–2 detik antar pesan agar tidak dianggap spam.
-			</p>
-
-			<div className="flex flex-wrap gap-2">
+			<div className="flex flex-wrap items-center gap-2.5 pt-1">
 				<button
 					type="button"
 					onClick={handlePreview}
 					disabled={previewLoading || running || !canTarget}
-					className="inline-flex items-center gap-2 rounded-xl bg-slate-100 px-4 py-2.5 text-xs font-bold text-[#102A46] hover:bg-slate-200 transition disabled:opacity-50"
+					className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-bold text-[#102A46] shadow-2xs hover:bg-slate-50 transition disabled:opacity-50 cursor-pointer"
 				>
-					{previewLoading ? "Memuat pratinjau..." : "Pratinjau Sehari Penuh"}
+					<Eye className={`h-4 w-4 ${previewLoading ? "animate-spin" : "text-[#1D5FA7]"}`} />
+					<span>{previewLoading ? "Memuat Pratinjau..." : "Pratinjau Sehari Penuh"}</span>
 				</button>
+
 				{preview && !running && (
 					<>
 						{firstPre && (
 							<button
 								type="button"
 								onClick={() => handleStart([firstPre.seq])}
-								className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-xs font-bold text-[#123B6D] ring-1 ring-[#123B6D]/30 hover:bg-[#F5F8FC] transition"
+								className="inline-flex items-center gap-2 rounded-xl border border-[#123B6D]/30 bg-[#F5F8FC] px-4 py-2.5 text-xs font-bold text-[#123B6D] hover:bg-blue-100/70 transition cursor-pointer"
 							>
-								<Play className="h-4 w-4" />
-								Kirim 1 Pre-Reminder
+								<Send className="h-3.5 w-3.5 text-[#1D5FA7]" />
+								<span>Kirim 1 Sampel (Pre-Reminder)</span>
 							</button>
 						)}
+
 						<button
 							type="button"
 							onClick={() => handleStart()}
-							className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#1D5FA7] transition"
+							className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#1D5FA7] transition cursor-pointer"
 						>
-							<Play className="h-4 w-4" />
-							Kirim Semua ({preview.messages.length} pesan ±{preview.estimatedSeconds}d)
+							<Play className="h-3.5 w-3.5" />
+							<span>Kirim Semua 10 Pesan</span>
+							<span className="rounded-md bg-white/20 px-1.5 py-0.5 text-[10px] font-mono">
+								±{preview.estimatedSeconds}d
+							</span>
 						</button>
 					</>
 				)}
+
 				{running && (
 					<button
 						type="button"
 						onClick={handleCancel}
 						disabled={cancelling}
-						className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-red-700 transition disabled:opacity-50"
+						className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-rose-700 transition disabled:opacity-50 cursor-pointer"
 					>
-						<Square className="h-4 w-4" />
-						{cancelling ? "Membatalkan..." : "Batalkan"}
+						<Square className="h-3.5 w-3.5" />
+						<span>{cancelling ? "Membatalkan..." : "Hentikan Simulasi"}</span>
 					</button>
 				)}
 			</div>
 
 			{!canTarget && (
-				<div className="rounded-xl bg-slate-50 p-3 text-xs text-slate-400">
-					{mode === "GROUP"
-						? "Pilih grup tersimpan dulu (atau sinkronisasi di menu Target)."
-						: "Isi nomor HP pribadi dulu pada pilihan di atas."}
+				<div className="flex items-center gap-2.5 rounded-2xl bg-amber-50 p-3.5 text-xs font-medium text-amber-900 border border-amber-200/80">
+					<AlertCircle className="h-4 w-4 text-amber-700 shrink-0" />
+					<span>
+						{mode === "GROUP"
+							? "Pilih grup tujuan yang tersimpan terlebih dahulu pada pilihan di atas."
+							: "Isi nomor WhatsApp pribadi tujuan pada input di atas."}
+					</span>
 				</div>
 			)}
 
 			{previewError && (
-				<div className="rounded-xl bg-red-50 p-3 text-xs text-red-800 font-medium">{previewError}</div>
-			)}
-
-			{preview && (
-				<div className="space-y-2">
-					<p className="text-xs font-semibold text-[#102A46]">
-						Pratinjau {preview.messages.length} pesan · {preview.dateLocal} · ke{" "}
-						{preview.target.displayName}
-					</p>
-					<div className="max-h-96 space-y-2 overflow-y-auto rounded-xl bg-slate-50 p-3">
-						{preview.messages.map((m) => (
-							<details key={m.seq} className="rounded-lg bg-white ring-1 ring-slate-200/70">
-								<summary className="cursor-pointer px-3 py-2 text-xs font-semibold text-[#172B43]">
-									{m.seq + 1}. {m.label}
-								</summary>
-								<p className="whitespace-pre-wrap px-3 pb-3 text-[11px] leading-relaxed text-[#475569]">
-									{m.body}
-								</p>
-							</details>
-						))}
-					</div>
+				<div className="flex items-center gap-2.5 rounded-2xl bg-rose-50 p-3.5 text-xs font-medium text-rose-900 border border-rose-200/80">
+					<XCircle className="h-4 w-4 text-rose-700 shrink-0" />
+					<span>{previewError}</span>
 				</div>
 			)}
 
+			{/* Progress & Live Status Box */}
 			{run && (
-				<div className="space-y-2 rounded-xl bg-[#F5F8FC] p-3">
-					<div className="flex items-center justify-between text-xs font-semibold text-[#102A46]">
-						<span>
-							{run.status === "RUNNING"
-								? `Mengirim... ${run.sent + run.failed}/${run.total}`
-								: run.status === "DONE"
-									? `Selesai: ${run.sent} terkirim, ${run.failed} gagal`
-									: `Dibatalkan: ${run.sent} terkirim, ${run.failed} gagal`}
-						</span>
+				<div className="rounded-2xl border border-blue-100 bg-linear-to-br from-[#F5F8FC] to-white p-4.5 space-y-3.5 shadow-xs">
+					<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+						<div className="flex items-center gap-2">
+							<span
+								className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold ${
+									run.status === "RUNNING"
+										? "bg-blue-100 text-[#123B6D] animate-pulse"
+										: run.status === "DONE"
+											? "bg-emerald-100 text-emerald-800"
+											: "bg-slate-200 text-slate-700"
+								}`}
+							>
+								{run.status === "RUNNING" && <span className="h-2 w-2 rounded-full bg-[#1D5FA7]" />}
+								{run.status === "DONE" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-700" />}
+								<span>
+									{run.status === "RUNNING"
+										? "Sedang Mengirim..."
+										: run.status === "DONE"
+											? "Simulasi Selesai"
+											: "Dibatalkan"}
+								</span>
+							</span>
+							<span className="text-xs text-[#64748B]">ke {run.target || "Target"}</span>
+						</div>
+
+						<div className="flex items-center gap-3 text-xs font-semibold">
+							<span className="text-emerald-700 font-mono">
+								✓ {run.sent} Terkirim
+							</span>
+							{run.failed > 0 && (
+								<span className="text-rose-700 font-mono">
+									✗ {run.failed} Gagal
+								</span>
+							)}
+							<span className="text-slate-500 font-mono">
+								/ Total {run.total}
+							</span>
+						</div>
 					</div>
-					<div className="h-2 overflow-hidden rounded-full bg-slate-200">
+
+					<div className="h-2.5 w-full overflow-hidden rounded-full bg-slate-200 shadow-inner">
 						<div
-							className="h-full rounded-full bg-[#1D5FA7] transition-all"
-							style={{ width: `${run.total > 0 ? ((run.sent + run.failed) / run.total) * 100 : 0}%` }}
+							className={`h-full transition-all duration-300 ${
+								run.status === "DONE"
+									? "bg-emerald-600"
+									: run.status === "CANCELLED"
+										? "bg-slate-500"
+										: "bg-linear-to-r from-[#123B6D] to-[#1D5FA7]"
+							}`}
+							style={{
+								width: `${run.total > 0 ? ((run.sent + run.failed) / run.total) * 100 : 0}%`,
+							}}
 						/>
 					</div>
-					{run.results
-						.filter((r) => !r.ok)
-						.map((r) => (
-							<p key={r.seq} className="text-[11px] text-red-700">
-								Pesan #{r.seq + 1} gagal: {r.error}
-							</p>
-						))}
+
+					{run.results.some((r) => !r.ok) && (
+						<div className="rounded-xl bg-rose-50 p-3 space-y-1 border border-rose-200/80">
+							{run.results
+								.filter((r) => !r.ok)
+								.map((r) => (
+									<p key={r.seq} className="text-xs text-rose-800">
+										• Pesan #{r.seq + 1} gagal dikirim: {r.error}
+									</p>
+								))}
+						</div>
+					)}
 				</div>
 			)}
 
 			{runError && (
-				<div className="rounded-xl bg-red-50 p-3 text-xs text-red-800 font-medium">{runError}</div>
+				<div className="flex items-center gap-2.5 rounded-2xl bg-rose-50 p-3.5 text-xs font-medium text-rose-900 border border-rose-200/80">
+					<XCircle className="h-4 w-4 text-rose-700 shrink-0" />
+					<span>{runError}</span>
+				</div>
+			)}
+
+			{/* WhatsApp Message Preview Section */}
+			{preview && (
+				<div className="space-y-3 pt-2">
+					<div className="flex items-center justify-between border-t border-slate-100 pt-3">
+						<div className="flex items-center gap-2">
+							<span className="text-xs font-bold text-[#102A46]">
+								Rangkaian Pesan ({preview.messages.length} Pesan)
+							</span>
+							<span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600">
+								{preview.target.displayName}
+							</span>
+						</div>
+
+						<button
+							type="button"
+							onClick={toggleExpandAll}
+							className="text-[11px] font-semibold text-[#1D5FA7] hover:underline cursor-pointer"
+						>
+							{preview.messages.every((m) => expandedSeqs[m.seq])
+								? "Tutup Semua"
+								: "Buka Semua"}
+						</button>
+					</div>
+
+					<div className="space-y-2.5 max-h-[520px] overflow-y-auto pr-1">
+						{preview.messages.map((m) => {
+							const isPre = m.messageType === "PRE_REMINDER";
+							const isExpanded = !!expandedSeqs[m.seq];
+
+							return (
+								<div
+									key={m.seq}
+									className={`rounded-2xl border transition-all ${
+										isExpanded
+											? "border-slate-300 bg-white shadow-xs"
+											: "border-slate-200/80 bg-slate-50/60 hover:bg-white"
+									}`}
+								>
+									<div
+										onClick={() => toggleExpand(m.seq)}
+										className="flex cursor-pointer items-center justify-between px-4 py-3 select-none"
+									>
+										<div className="flex items-center gap-2.5">
+											<span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-slate-200 font-mono text-[11px] font-bold text-slate-700">
+												{m.seq + 1}
+											</span>
+
+											<span
+												className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] font-bold ${
+													isPre
+														? "bg-amber-100 text-amber-800"
+														: "bg-emerald-100 text-emerald-800"
+												}`}
+											>
+												{isPre ? (
+													<Bell className="h-3 w-3" />
+												) : (
+													<Volume2 className="h-3 w-3" />
+												)}
+												{isPre ? "Pre-Reminder" : "Adzan & Hadits"}
+											</span>
+
+											<span className="text-xs font-bold text-[#102A46]">
+												{m.label.replace(/^(Pre-reminder|Adzan)\s*·\s*/i, "")}
+											</span>
+										</div>
+
+										<div className="flex items-center gap-2">
+											{!running && (
+												<button
+													type="button"
+													onClick={(e) => {
+														e.stopPropagation();
+														void handleStart([m.seq]);
+													}}
+													className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] font-semibold text-[#123B6D] hover:bg-blue-50 transition"
+													title="Kirim hanya pesan ini ke target"
+												>
+													Kirim Ini
+												</button>
+											)}
+											{isExpanded ? (
+												<ChevronUp className="h-4 w-4 text-slate-400" />
+											) : (
+												<ChevronDown className="h-4 w-4 text-slate-400" />
+											)}
+										</div>
+									</div>
+
+									{isExpanded && (
+										<div className="border-t border-slate-100 px-4 pb-4 pt-3 space-y-2">
+											<div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-3.5 shadow-2xs">
+												<div className="flex items-center gap-1.5 pb-2 text-[10px] font-semibold text-emerald-800 border-b border-emerald-100/80">
+													<Sparkles className="h-3 w-3" />
+													<span>Pratinjau Format Pesan WhatsApp:</span>
+												</div>
+												<p className="mt-2 whitespace-pre-wrap font-sans text-xs leading-relaxed text-[#172B43]">
+													{m.body}
+												</p>
+											</div>
+
+											{m.contentRef && (
+												<p className="text-[10px] text-slate-400 font-mono">
+													Ref: {m.contentRef}
+												</p>
+											)}
+										</div>
+									)}
+								</div>
+							);
+						})}
+					</div>
+				</div>
 			)}
 		</div>
 	);

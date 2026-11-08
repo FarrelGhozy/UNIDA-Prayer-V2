@@ -282,7 +282,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 				</div>
 			</aside>
 
-			<div className="flex flex-1 flex-col">
+			<div className="relative z-10 flex flex-1 flex-col">
 				<main className="flex-1 p-4 sm:p-6 lg:p-8">
 					<div className="mx-auto max-w-5xl">{children}</div>
 				</main>
