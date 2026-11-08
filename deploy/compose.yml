@@ -23,9 +23,6 @@ services:
     restart: unless-stopped
     env_file:
       - ../.env
-    volumes:
-      # MySQL native di host; container akses lewat Unix socket, bukan TCP.
-      - /var/run/mysqld:/var/run/mysqld
     expose:
       - "3511"
     networks:
@@ -46,9 +43,6 @@ services:
     restart: unless-stopped
     env_file:
       - ../.env
-    volumes:
-      # MySQL native di host; container akses lewat Unix socket, bukan TCP.
-      - /var/run/mysqld:/var/run/mysqld
     networks:
       - backend_net
     depends_on:

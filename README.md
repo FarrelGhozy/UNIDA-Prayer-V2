@@ -211,7 +211,7 @@ curl -sS http://127.0.0.1:3542/api/health
 curl -sS http://127.0.0.1:3542/api/ready
 ```
 
-Jika MySQL native di host yang sama, `deploy/compose.yml` sudah memount `/var/run/mysqld`; pastikan `DATABASE_URL` memakai `?socketPath=/var/run/mysqld/mysqld.sock` (lihat `docs/14-panduan-mysql.md` §14.3.1).
+Jika MySQL native di host yang sama, set `bind-address = 127.0.0.1,172.17.0.1` (tanpa spasi) dan grant user `@172.21.%`, lalu `DATABASE_URL=...@172.17.0.1:3306/...` (lihat `docs/14-panduan-mysql.md` §14.3.1).
 
 ---
 

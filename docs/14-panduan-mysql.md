@@ -29,7 +29,7 @@ FLUSH PRIVILEGES;
 
 Catatan:
 - Ganti `'GANTI_PASSWORD_KUAT'` dengan password acak panjang. Bila password memuat karakter khusus (`@`, `/`, `#`, `?`), encode saat dipakai di `DATABASE_URL` (lihat §14.3) atau pakai password alfanumerik panjang.
-- `'%'` mengizinkan koneksi dari container/host lain. Bila MySQL dan aplikasi satu host, gunakan Unix socket (lihat §14.3.1) dan user `'localhost'`; tidak perlu `'%'`.
+- `'%'` mengizinkan koneksi dari container/host lain. Untuk container di host yang sama, gunakan grant spesifik subnet Docker (mis. `'172.21.%'`, lihat §14.3.1) agar tidak membuka ke semua host.
 - Jangan berikan `ALL PRIVILEGES` / `SUPER` / akses ke schema `mysql.*`.
 
 ## 14.3 `DATABASE_URL`
@@ -45,25 +45,31 @@ DATABASE_URL=mysql://unida_prayer:GANTI_PASSWORD_KUAT@DB_HOST:3306/unida_prayer
 
 ### 14.3.1 MySQL native di host yang sama (container Compose)
 
-Di dalam container, `localhost:3306` menunjuk ke container itu sendiri, bukan host. Jika MySQL native berjalan di host yang sama, mount socket MySQL ke `api`/`worker`:
+Di dalam container, `localhost:3306` menunjuk ke container itu sendiri, bukan host. Jika MySQL native berjalan di host yang sama:
 
-```yaml
-services:
-  api:
-    volumes:
-      - /var/run/mysqld:/var/run/mysqld
-  worker:
-    volumes:
-      - /var/run/mysqld:/var/run/mysqld
-```
+1. Set MySQL agar listen juga di gateway Docker default (`172.17.0.1`), tanpa spasi:
+   ```
+   bind-address = 127.0.0.1,172.17.0.1
+   ```
+   Lalu restart MySQL: `sudo systemctl restart mysql`.
 
-Lalu gunakan:
+2. Buat grant untuk subnet container backend (`deploy_backend_net` umumnya `172.21.0.0/16`):
+   ```sql
+   CREATE USER IF NOT EXISTS 'unida_prayer'@'172.21.%' IDENTIFIED BY 'PASSWORD';
+   GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, DROP, REFERENCES, INDEX
+     ON unida_prayer.* TO 'unida_prayer'@'172.21.%';
+   FLUSH PRIVILEGES;
+   ```
 
-```env
-DATABASE_URL=mysql://unida_prayer:PASSWORD@localhost/unida_prayer?socketPath=/var/run/mysqld/mysqld.sock
-```
+3. Gunakan:
+   ```env
+   DATABASE_URL=mysql://unida_prayer:PASSWORD@172.17.0.1:3306/unida_prayer
+   ```
+   Container API/worker mencapai host di `172.17.0.1`; MySQL melihat source IP container `172.21.0.x`, sehingga grant `172.21.%` cocok.
 
-Dengan cara ini MySQL tetap listen `127.0.0.1:3306`, user cukup `unida_prayer@localhost`, dan port 3306 tidak perlu dibuka ke jaringan.
+4. `mysqlx-bind-address` tetap `127.0.0.1`; port 3306 tidak perlu dibuka ke LAN.
+
+Catatan: jangan menulis `bind-address = 127.0.0.1, 172.17.0.1` dengan spasi — MySQL gagal start (`cannot resolve hostname`).
 
 ## 14.4 Verifikasi koneksi
 

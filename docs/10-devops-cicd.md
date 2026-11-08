@@ -29,8 +29,6 @@ services:
     image: ghcr.io/OWNER/unida-prayer-v2-api:latest
     restart: unless-stopped
     env_file: [.env]
-    volumes:
-      - /var/run/mysqld:/var/run/mysqld
     expose: ["3511"]
     depends_on: [waha]
   worker:
@@ -38,8 +36,6 @@ services:
     command: ["bun", "run", "worker"]
     restart: unless-stopped
     env_file: [.env]
-    volumes:
-      - /var/run/mysqld:/var/run/mysqld
     depends_on: [waha]
   waha:
     image: devlikeapro/waha:gows-2026.10.1
@@ -59,7 +55,7 @@ Aturan:
 - Reverse proxy/TLS ditunda (keputusan pemilik) — untuk sekarang cukup loopback.
 - Tambah `healthcheck` API via `/api/health|/ready`.
 - Jalankan Compose dengan `--env-file .env` dari root repo agar substitusi `${...}` (kredensial WAHA, path admin/login) memakai `.env` yang sama dengan `env_file` container.
-- Jika MySQL native di host yang sama dengan container, mount `/var/run/mysqld` ke `api`/`worker` dan pakai `DATABASE_URL=...@localhost/<db>?socketPath=/var/run/mysqld/mysqld.sock`. MySQL tetap bind `127.0.0.1`; tidak perlu membuka TCP atau grant subnet Docker.
+- Jika MySQL native di host yang sama dengan container, set `bind-address = 127.0.0.1,172.17.0.1` (tanpa spasi) dan grant user untuk subnet container (`user@172.21.%`). `DATABASE_URL` memakai `172.17.0.1:3306`; port 3306 tidak perlu dibuka ke LAN.
 - `.env` prod di server saja (lihat §10.3).
 
 ## 10.2 Image (2 image)
@@ -84,8 +80,8 @@ WEB_URL=https://prayer.example.ac.id
 API_PORT=3511
 # MySQL terpisah:
 DATABASE_URL=mysql://unida_prayer:CHANGE_ME@DB_HOST:3306/unida_prayer
-# MySQL native di host yang sama (container via Unix socket):
-# DATABASE_URL=mysql://unida_prayer:CHANGE_ME@localhost/unida_prayer?socketPath=/var/run/mysqld/mysqld.sock
+# MySQL native di host yang sama (container via gateway Docker):
+# DATABASE_URL=mysql://unida_prayer:CHANGE_ME@172.17.0.1:3306/unida_prayer
 WAHA_BASE_URL=http://waha:3000
 WAHA_API_KEY=CHANGE_ME
 WAHA_SESSION=unida-prayer
@@ -93,7 +89,7 @@ INTERNAL_API_URL=http://api:3511
 NEXT_PUBLIC_API_BASE_URL=/api
 ```
 
-Catatan: `DB_HOST` ke MySQL eksternal (Fedora lokal saat dev, home server saat prod). Jika MySQL native di host yang sama, gunakan opsi `socketPath` di atas dan mount `/var/run/mysqld` ke `api`/`worker`; user DB cukup `@localhost`. Encode karakter khusus password. `WAHA_SESSION` default `unida-prayer` (kunci Q-WAHA-05). Jangan simpan secret di `app_settings`.
+Catatan: `DB_HOST` ke MySQL eksternal (Fedora lokal saat dev, home server saat prod). Jika MySQL native di host yang sama, bind MySQL ke `127.0.0.1,172.17.0.1` (tanpa spasi) dan grant user untuk subnet container (`user@172.21.%`). Encode karakter khusus password. `WAHA_SESSION` default `unida-prayer` (kunci Q-WAHA-05). Jangan simpan secret di `app_settings`.
 
 ## 10.4 Workflow GitHub Actions
 
