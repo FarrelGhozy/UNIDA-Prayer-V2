@@ -30,7 +30,7 @@ export function SessionActionModal({
 				: "PERINGATAN: Tindakan ini akan menghapus sesi login dan pairing perangkat pada WAHA. Anda harus melakukan pemindaian QR code ulang untuk menghubungkan kembali bot WhatsApp.";
 
 	return (
-		<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
+		<div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 p-4 backdrop-blur-xs">
 			<div className="w-full max-w-sm rounded-3xl bg-white p-6 shadow-xl space-y-4">
 				<div className="flex items-center gap-3 text-rose-600">
 					<div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-rose-50">
