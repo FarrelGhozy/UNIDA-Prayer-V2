@@ -72,7 +72,7 @@ export function HaditsTable({
 			<div className="overflow-x-auto">
 				<table className="w-full text-left border-collapse text-xs">
 					<thead>
-						<tr className="border-b border-slate-100 bg-slate-50/90 text-[11px] font-bold text-slate-700 dark:border-white/10 dark:bg-[#122842]/90 dark:text-slate-200">
+						<tr className="border-b border-slate-200/90 bg-slate-100/90 text-[11px] font-extrabold text-[#102A46] dark:border-white/10 dark:bg-[#122842]/90 dark:text-slate-200">
 							<th className="py-3 px-4 w-12 text-center">#</th>
 							<th className="py-3 px-4">Teks Terjemahan</th>
 							<th className="py-3 px-4 w-52">Sumber Periwayatan</th>
@@ -80,18 +80,18 @@ export function HaditsTable({
 							<th className="py-3 px-4 w-44 text-right">Aksi</th>
 						</tr>
 					</thead>
-					<tbody className="divide-y divide-slate-100 text-[#172B43] dark:divide-white/10 dark:text-slate-200">
+					<tbody className="divide-y divide-slate-200/60 text-[#172B43] dark:divide-white/10 dark:text-slate-200">
 						{hadiths.map((h, idx) => (
 							<tr key={h.id} className="transition hover:bg-slate-50/80 dark:hover:bg-white/5">
-								<td className="py-3 px-4 text-center text-slate-400 font-mono text-[11px] dark:text-slate-400">
+								<td className="py-3 px-4 text-center text-slate-600 font-mono text-[11px] font-semibold dark:text-slate-400">
 									{(page - 1) * 15 + idx + 1}
 								</td>
 								<td className="py-3 px-4">
-									<p className="font-medium text-[#102A46] leading-relaxed line-clamp-2 dark:text-slate-100">
+									<p className="font-semibold text-[#102A46] leading-relaxed line-clamp-2 dark:text-slate-100">
 										&ldquo;{h.text}&rdquo;
 									</p>
 									{h.seedKey && (
-										<span className="inline-block mt-1 rounded-md bg-slate-100 px-1.5 py-0.5 text-[9px] font-mono text-slate-500 dark:bg-white/10 dark:text-slate-400">
+										<span className="inline-block mt-1 rounded-md bg-slate-200/70 px-1.5 py-0.5 text-[9px] font-mono font-medium text-slate-700 dark:bg-white/10 dark:text-slate-300">
 											Seed: {h.seedKey}
 										</span>
 									)}

@@ -61,7 +61,7 @@ export function RecentActivityTable({ recent }: RecentActivityTableProps) {
 				<div className="overflow-x-auto">
 					<table className="w-full text-left border-collapse text-xs">
 						<thead>
-							<tr className="border-b border-slate-200/60 bg-slate-50/80 text-[11px] font-bold text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+							<tr className="border-b border-slate-200/90 bg-slate-100/90 text-[11px] font-extrabold text-[#102A46] dark:border-white/10 dark:bg-white/10 dark:text-slate-200">
 								<th className="py-2.5 px-3">Status</th>
 								<th className="py-2.5 px-3">Shalat</th>
 								<th className="py-2.5 px-3">Target Grup</th>
@@ -69,22 +69,22 @@ export function RecentActivityTable({ recent }: RecentActivityTableProps) {
 								<th className="py-2.5 px-3">Keterangan / Error</th>
 							</tr>
 						</thead>
-						<tbody className="divide-y divide-slate-200/40 text-[#172B43] dark:divide-white/5 dark:text-slate-200">
+						<tbody className="divide-y divide-slate-200/60 text-[#172B43] dark:divide-white/5 dark:text-slate-200">
 							{recent.map((item) => (
-								<tr key={item.id} className="hover:bg-slate-50/60 dark:hover:bg-white/5 transition">
+								<tr key={item.id} className="hover:bg-slate-50/70 dark:hover:bg-white/5 transition">
 									<td className="py-2.5 px-3">
 										<MessageStatusBadge status={item.status} />
 									</td>
 									<td className="py-2.5 px-3 font-semibold text-[#102A46] dark:text-white">
 										{formatPrayerName(item.prayerName)}{" "}
-										<span className="text-[10px] text-slate-500 font-medium dark:text-slate-400">
+										<span className="text-[10px] text-slate-700 font-semibold dark:text-slate-300">
 											({item.messageType === "ADHAN" ? "Adzan" : "Pre"})
 										</span>
 									</td>
 									<td className="py-2.5 px-3 font-medium text-[#102A46] dark:text-white">
 										{item.targetName}
 									</td>
-									<td className="py-2.5 px-3 font-medium text-slate-600 dark:text-slate-300">
+									<td className="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300">
 										{formatScheduledTime(item.scheduledAtUtc)}
 									</td>
 									<td className="py-2.5 px-3">

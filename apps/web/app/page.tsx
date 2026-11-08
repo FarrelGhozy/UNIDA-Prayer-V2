@@ -76,6 +76,17 @@ export default function HomePage() {
 		return () => clearInterval(timer);
 	}, []);
 
+	const [paramTheme, setParamTheme] = useState<"light" | "dark" | null>(null);
+
+	useEffect(() => {
+		if (typeof window !== "undefined") {
+			const t = new URLSearchParams(window.location.search).get("theme")?.toLowerCase();
+			if (t === "light" || t === "dark") {
+				setParamTheme(t as "light" | "dark");
+			}
+		}
+	}, []);
+
 	// Tema otomatis: Terbit s.d. Maghrib = Terang, di luar itu = Gelap
 	const isDaytime = useMemo(() => {
 		if (!now) return false;
@@ -89,7 +100,7 @@ export default function HomePage() {
 		return hour >= 5 && hour < 18;
 	}, [data, now, serverSkewMs]);
 
-	const theme: "light" | "dark" = isDaytime ? "light" : "dark";
+	const theme: "light" | "dark" = paramTheme || (isDaytime ? "light" : "dark");
 
 	// Countdown auto-advance: jika waktu tiba (00), langsung muat waktu shalat berikutnya
 	const nextPrayerUtc = data?.nextPrayer?.scheduledAtUtc;

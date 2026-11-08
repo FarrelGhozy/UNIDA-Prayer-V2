@@ -103,7 +103,7 @@ export function MessagesTable({
 			<div className="overflow-x-auto">
 				<table className="w-full text-left border-collapse text-xs">
 					<thead>
-						<tr className="border-b border-slate-100 bg-slate-50/90 text-[11px] font-bold text-slate-700 dark:border-white/10 dark:bg-[#122842]/90 dark:text-slate-200">
+						<tr className="border-b border-slate-200/90 bg-slate-100/90 text-[11px] font-extrabold text-[#102A46] dark:border-white/10 dark:bg-[#122842]/90 dark:text-slate-200">
 							<th className="py-3 px-4">Status</th>
 							<th className="py-3 px-4">Waktu & Tipe</th>
 							<th className="py-3 px-4">Target Grup</th>
@@ -112,7 +112,7 @@ export function MessagesTable({
 							<th className="py-3 px-4 text-right">Aksi</th>
 						</tr>
 					</thead>
-					<tbody className="divide-y divide-slate-100 text-[#172B43] dark:divide-white/10 dark:text-slate-200">
+					<tbody className="divide-y divide-slate-200/60 text-[#172B43] dark:divide-white/10 dark:text-slate-200">
 						{messages.map((item) => (
 							<tr key={item.id} className="transition hover:bg-slate-50/80 dark:hover:bg-white/5">
 								<td className="py-3 px-4">
@@ -122,19 +122,19 @@ export function MessagesTable({
 									<div className="font-bold text-[#102A46] dark:text-white">
 										{formatPrayerName(item.prayerName)}
 									</div>
-									<span className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+									<span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">
 										{item.messageType === "ADHAN" ? "Adzan" : "Pre-Reminder"}
 									</span>
 								</td>
 								<td className="py-3 px-4">
 									<div className="font-semibold text-[#102A46] dark:text-white">{item.targetName}</div>
-									<span className="text-[10px] text-slate-500 font-mono dark:text-slate-400">
+									<span className="text-[10px] text-slate-700 font-mono font-medium dark:text-slate-300">
 										{item.targetExternalId}
 									</span>
 								</td>
 								<td className="py-3 px-4">
 									<div className="font-medium text-[#102A46] dark:text-slate-200">{item.prayerDate}</div>
-									<span className="text-[11px] font-medium text-slate-600 dark:text-slate-400">
+									<span className="text-[11px] font-medium text-slate-700 dark:text-slate-300">
 										{new Date(item.scheduledAtUtc).toLocaleTimeString("id-ID", {
 											hour: "2-digit",
 											minute: "2-digit",

@@ -47,7 +47,7 @@ export function ReminderSettingsCard({
 						<span className="font-bold text-[#102A46] dark:text-slate-200">
 							Aktifkan Seluruh Jadwal Pengingat Shalat
 						</span>
-						<p className="text-[#64748B] text-[11px] mt-0.5 dark:text-slate-400">
+						<p className="text-slate-600 font-medium text-[11px] mt-0.5 dark:text-slate-400">
 							Bila dinonaktifkan, generator tidak akan membuat jadwal pesan baru.
 						</p>
 					</label>
@@ -65,7 +65,7 @@ export function ReminderSettingsCard({
 						<span className="font-bold text-[#102A46] dark:text-slate-200">
 							Pesan Saat Masuk Waktu Shalat (Adzan)
 						</span>
-						<p className="text-[#64748B] text-[11px] mt-0.5 dark:text-slate-400">
+						<p className="text-slate-600 font-medium text-[11px] mt-0.5 dark:text-slate-400">
 							Mengirim pesan tepat saat waktu shalat tiba (Subuh, Dzuhur/Jumat, Ashar, Maghrib, Isya).
 						</p>
 					</label>
@@ -83,7 +83,7 @@ export function ReminderSettingsCard({
 						<span className="font-bold text-[#102A46] dark:text-slate-200">
 							Pesan Pengingat Persiapan (Pre-Reminder)
 						</span>
-						<p className="text-[#64748B] text-[11px] mt-0.5 dark:text-slate-400">
+						<p className="text-slate-600 font-medium text-[11px] mt-0.5 dark:text-slate-400">
 							Mengirim pengingat beberapa menit sebelum waktu shalat masuk agar jamaah dapat bersiap-siap.
 						</p>
 					</label>
@@ -104,7 +104,7 @@ export function ReminderSettingsCard({
 							}
 							className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none dark:border-white/15 dark:bg-slate-900/60 dark:text-white dark:focus:bg-slate-900 dark:focus:border-sky-400"
 						/>
-						<span className="text-[10px] text-[#64748B] dark:text-slate-400">Rentang: 1 - 30 menit sebelum adzan.</span>
+						<span className="text-[10px] text-slate-600 font-medium dark:text-slate-400">Rentang: 1 - 30 menit sebelum adzan.</span>
 					</div>
 
 					<div>
@@ -121,7 +121,7 @@ export function ReminderSettingsCard({
 							}
 							className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-semibold text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none dark:border-white/15 dark:bg-slate-900/60 dark:text-white dark:focus:bg-slate-900 dark:focus:border-sky-400"
 						/>
-						<span className="text-[10px] text-[#64748B] dark:text-slate-400">
+						<span className="text-[10px] text-slate-600 font-medium dark:text-slate-400">
 							Pesan yang tertunda melebihi menit ini otomatis ditandai <code className="dark:text-sky-300">EXPIRED</code> (tidak dikirim).
 						</span>
 					</div>

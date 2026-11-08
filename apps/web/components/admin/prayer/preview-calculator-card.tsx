@@ -41,7 +41,7 @@ export function PreviewCalculatorCard({
 				</h2>
 			</div>
 
-			<p className="text-xs text-[#64748B] dark:text-slate-300">
+			<p className="text-xs text-slate-700 font-medium dark:text-slate-300">
 				Simulasikan hasil jadwal shalat secara langsung tanpa harus menyimpan perubahan ke database.
 			</p>
 
@@ -96,8 +96,8 @@ export function PreviewCalculatorCard({
 				</div>
 			)}
 
-			<div className="rounded-xl bg-slate-50 p-3 text-[11px] text-[#64748B] flex items-start gap-2 dark:bg-white/5 dark:text-slate-400">
-				<HelpCircle className="h-4 w-4 shrink-0 text-slate-400 dark:text-slate-500 mt-0.5" />
+			<div className="rounded-xl bg-blue-50/80 border border-blue-200/70 p-3 text-[11px] text-[#123B6D] font-medium flex items-start gap-2 dark:bg-white/5 dark:text-slate-300 dark:border-white/10">
+				<HelpCircle className="h-4 w-4 shrink-0 text-[#1D5FA7] dark:text-sky-400 mt-0.5" />
 				<span>
 					Waktu adzan dan pre-reminder yang dikirim ke WhatsApp bersumber dari parameter hisab ini.
 				</span>

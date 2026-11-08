@@ -140,7 +140,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 				overlayClassName={
 					theme === "dark"
 						? "bg-linear-to-b from-[#030914]/85 via-[#07172E]/70 to-[#081B34]/90 backdrop-blur-[4px]"
-						: "bg-linear-to-b from-[#06192E]/50 via-[#0D2644]/25 to-[#E8F0F8]/85 backdrop-blur-[3px]"
+						: "bg-linear-to-b from-[#06192E]/65 via-[#0D2644]/45 to-[#E8F0F8]/88 backdrop-blur-[5px]"
 				}
 			/>
 

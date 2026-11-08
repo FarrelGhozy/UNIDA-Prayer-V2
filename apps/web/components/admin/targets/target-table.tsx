@@ -69,7 +69,7 @@ export function TargetTable({
 		<div className="overflow-x-auto">
 			<table className="w-full text-left border-collapse text-xs">
 				<thead>
-					<tr className="border-b border-slate-200/60 bg-slate-50/80 text-[11px] font-bold text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+					<tr className="border-b border-slate-200/90 bg-slate-100/90 text-[11px] font-extrabold text-[#102A46] dark:border-white/10 dark:bg-white/10 dark:text-slate-200">
 						<th className="py-3 px-4 w-12 text-center">#</th>
 						<th className="py-3 px-4">Nama Grup / Target</th>
 						<th className="py-3 px-4">WhatsApp Chat ID</th>
@@ -77,10 +77,10 @@ export function TargetTable({
 						<th className="py-3 px-4 w-36 text-right">Aksi</th>
 					</tr>
 				</thead>
-				<tbody className="divide-y divide-slate-200/40 text-[#172B43] dark:divide-white/5 dark:text-slate-200">
+				<tbody className="divide-y divide-slate-200/60 text-[#172B43] dark:divide-white/5 dark:text-slate-200">
 					{targets.map((target, idx) => (
-						<tr key={target.id} className="hover:bg-slate-50/60 dark:hover:bg-white/5 transition">
-							<td className="py-3 px-4 text-center text-slate-400 font-mono text-[11px] dark:text-slate-500">
+						<tr key={target.id} className="hover:bg-slate-50/70 dark:hover:bg-white/5 transition">
+							<td className="py-3 px-4 text-center text-slate-500 font-mono text-[11px] font-semibold dark:text-slate-400">
 								{idx + 1}
 							</td>
 
@@ -121,12 +121,12 @@ export function TargetTable({
 										</button>
 									</div>
 								)}
-								<span className="text-[10px] text-slate-400 dark:text-slate-400 block">
+								<span className="text-[10px] text-slate-500 dark:text-slate-400 block font-medium">
 									Ditambahkan: {new Date(target.createdAt).toLocaleDateString("id-ID")}
 								</span>
 							</td>
 
-							<td className="py-3 px-4 font-mono text-[11px] text-[#64748B] dark:text-slate-300">
+							<td className="py-3 px-4 font-mono text-[11px] font-semibold text-slate-700 dark:text-slate-300">
 								{target.targetId}
 							</td>
 

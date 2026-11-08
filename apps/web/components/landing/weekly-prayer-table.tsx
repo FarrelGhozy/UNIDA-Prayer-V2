@@ -43,7 +43,7 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 			<div className="overflow-x-auto">
 				<table className="w-full min-w-[620px] text-left border-collapse text-xs">
 					<thead>
-						<tr className="border-b border-slate-200/40 bg-slate-50/50 text-[11px] font-bold text-slate-700 backdrop-blur-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+						<tr className="border-b border-slate-200/90 bg-slate-100/90 text-[11px] font-extrabold text-[#102A46] backdrop-blur-md dark:border-white/10 dark:bg-white/10 dark:text-slate-200">
 							<th className="py-3 px-4">Hari & Tanggal</th>
 							<th className="py-3 px-3 text-center">Subuh</th>
 							<th className="py-3 px-3 text-center">Terbit</th>

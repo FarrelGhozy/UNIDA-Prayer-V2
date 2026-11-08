@@ -25,7 +25,7 @@ export function PrayerCard({
 	const cardClasses = isNext
 		? "glass-panel-active glass-sheen -translate-y-1"
 		: isPassed
-			? "glass-panel-passed opacity-75 hover:opacity-90"
+			? "glass-panel-passed transition-transform hover:-translate-y-0.5"
 			: "glass-panel glass-sheen hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(18,59,109,0.12),inset_0_1px_1px_rgba(255,255,255,1)] dark:hover:shadow-[0_15px_35px_rgba(29,95,167,0.2),inset_0_1px_1px_rgba(255,255,255,0.2)]";
 
 	return (
@@ -49,7 +49,7 @@ export function PrayerCard({
 							isNext
 								? "bg-linear-to-br from-[#123B6D] to-[#1D5FA7] text-[#6BA9D8] shadow-sm dark:from-[#0A1B2E] dark:to-[#123B6D] dark:text-[#6BA9D8]"
 								: isPassed
-									? "bg-slate-200/50 text-slate-500 dark:bg-white/5 dark:text-slate-500"
+									? "bg-slate-200/80 text-slate-600 dark:bg-white/10 dark:text-slate-400"
 									: "border border-blue-400/20 bg-blue-500/10 text-[#1D5FA7] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] dark:border-sky-400/20 dark:bg-sky-500/15 dark:text-[#6BA9D8] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]"
 						}`}
 					>
@@ -64,32 +64,36 @@ export function PrayerCard({
 
 					{isPassed && (
 						<span title="Sudah lewat">
-							<CheckCircle2 className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+							<CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
 						</span>
 					)}
 				</div>
 
 				<div className="mt-3">
-					<h4 className="text-xs font-bold text-[#102A46] dark:text-white">{name}</h4>
+					<h4 className={`text-xs font-bold ${isPassed ? "text-slate-700 dark:text-slate-200" : "text-[#102A46] dark:text-white"}`}>
+						{name}
+					</h4>
 					{isAstronomicalNote && (
 						<span className="text-[10px] text-slate-500 dark:text-slate-400">Batas Terbit</span>
 					)}
 				</div>
 			</div>
 
-			<div className="mt-4 pt-2 border-t border-slate-200/40 dark:border-white/10">
+			<div className="mt-4 pt-2 border-t border-slate-200/60 dark:border-white/10">
 				<span
 					className={`font-mono text-base font-extrabold tracking-tight tabular-nums ${
 						isNext
 							? "text-[#123B6D] dark:text-white"
 							: isPassed
-								? "text-slate-500 dark:text-slate-500"
+								? "text-slate-800 dark:text-slate-200"
 								: "text-[#102A46] dark:text-white"
 					}`}
 				>
 					{time.replace(" WIB", "")}
 				</span>
-				<span className="ml-1 text-[10px] font-semibold text-[#64748B] dark:text-slate-400">WIB</span>
+				<span className={`ml-1 text-[10px] font-semibold ${isPassed ? "text-slate-600 dark:text-slate-400" : "text-[#64748B] dark:text-slate-400"}`}>
+					WIB
+				</span>
 			</div>
 		</div>
 	);
