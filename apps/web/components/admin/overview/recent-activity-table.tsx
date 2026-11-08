@@ -26,6 +26,20 @@ export function RecentActivityTable({ recent }: RecentActivityTableProps) {
 		}
 	};
 
+	const formatScheduledTime = (utcStr: string | null | undefined) => {
+		if (!utcStr) return "-";
+		try {
+			const d = new Date(utcStr);
+			if (Number.isNaN(d.getTime())) return "-";
+			return d.toLocaleString("id-ID", {
+				dateStyle: "short",
+				timeStyle: "short",
+			});
+		} catch {
+			return "-";
+		}
+	};
+
 	return (
 		<div className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-2xs space-y-4">
 			<div className="flex items-center justify-between border-b border-slate-100 pb-3">
@@ -71,10 +85,7 @@ export function RecentActivityTable({ recent }: RecentActivityTableProps) {
 										{item.targetName}
 									</td>
 									<td className="py-2.5 px-3 font-medium text-slate-600">
-										{new Date(item.scheduledAtUtc).toLocaleString("id-ID", {
-											dateStyle: "short",
-											timeStyle: "short",
-										})}
+										{formatScheduledTime(item.scheduledAtUtc)}
 									</td>
 									<td className="py-2.5 px-3">
 										{item.lastError ? (

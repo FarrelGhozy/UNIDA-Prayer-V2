@@ -157,7 +157,7 @@ export function DynamicPrayerBackground({
 	return (
 		<aside
 			aria-label="Latar belakang kampus dinamis"
-			className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
+			className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
 		>
 			{BACKGROUND_VARIANTS.map((variant) => {
 				const isActive = variant.key === activePhase;

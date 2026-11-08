@@ -55,10 +55,10 @@ export default function AdminOverviewPage() {
 
 			<MetricsGrid statusData={statusData} />
 
-			{statusData && (
+			{statusData?.counts && (
 				<AttentionBanner
-					failedCount={statusData.counts.failed}
-					unknownCount={statusData.counts.unknown}
+					failedCount={statusData.counts.failed ?? 0}
+					unknownCount={statusData.counts.unknown ?? 0}
 				/>
 			)}
 
