@@ -228,6 +228,9 @@ export default function HomePage() {
 
 			<main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8">
 				<div className="mx-auto max-w-5xl space-y-6 sm:space-y-8">
+					<h1 className="sr-only">
+						UNIDA Prayer — Jadwal Shalat Kampus Siman & Pengingat WhatsApp
+					</h1>
 					{loading && <SkeletonLoading />}
 
 					{error && !loading && (

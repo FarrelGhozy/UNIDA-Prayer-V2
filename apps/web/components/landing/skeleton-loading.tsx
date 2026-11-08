@@ -1,6 +1,17 @@
 export function SkeletonLoading() {
 	return (
-		<div className="space-y-6">
+		<div
+			className="space-y-6"
+			aria-busy="true"
+			aria-label="Memuat jadwal shalat UNIDA Gontor"
+		>
+			<div className="sr-only">
+				<h2>Jadwal Shalat Hari Ini — Kampus UNIDA Gontor Siman Ponorogo</h2>
+				<p>
+					Memuat informasi jadwal shalat akurat untuk waktu Subuh, Terbit,
+					Dzuhur, Ashar, Maghrib, dan Isya serta layanan pengingat bot WhatsApp.
+				</p>
+			</div>
 			<div className="h-64 w-full animate-pulse rounded-3xl glass-panel p-8">
 				<div className="h-6 w-36 rounded-md bg-slate-300/60 dark:bg-slate-700/60" />
 				<div className="mt-4 h-12 w-64 rounded-lg bg-slate-300/60 dark:bg-slate-700/60" />

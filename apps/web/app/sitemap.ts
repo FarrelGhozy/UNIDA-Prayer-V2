@@ -4,7 +4,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 	const baseUrl =
 		process.env.NEXT_PUBLIC_APP_URL ||
 		process.env.WEB_URL ||
-		"https://prayer.unida.gontor.ac.id";
+		"https://prayer.utc.web.id";
 	const cleanBase = baseUrl.replace(/\/+$/, "");
 
 	return [
@@ -13,6 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 			lastModified: new Date(),
 			changeFrequency: "daily",
 			priority: 1,
+			images: [`${cleanBase}/og-image.jpg`],
 		},
 	];
 }

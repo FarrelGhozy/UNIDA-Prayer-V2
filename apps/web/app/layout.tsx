@@ -22,24 +22,36 @@ export const viewport: Viewport = {
 const appUrl =
 	process.env.NEXT_PUBLIC_APP_URL ||
 	process.env.WEB_URL ||
-	"https://prayer.unida.gontor.ac.id";
+	"https://prayer.utc.web.id";
 const cleanAppUrl = appUrl.replace(/\/+$/, "");
 
 export const metadata: Metadata = {
 	metadataBase: new URL(cleanAppUrl),
-	title: "UNIDA Prayer — Jadwal Shalat Kampus Siman & Pengingat WhatsApp",
+	title: {
+		default: "UNIDA Prayer — Jadwal Shalat Kampus Siman & Pengingat WhatsApp",
+		template: "%s | UNIDA Prayer",
+	},
 	description:
 		"Jadwal shalat harian akurat untuk kampus Universitas Darussalam Gontor dan sistem bot pengingat waktu shalat via WhatsApp.",
 	keywords: [
 		"UNIDA Gontor",
 		"Jadwal Shalat",
 		"Siman Ponorogo",
+		"Jadwal Shalat UNIDA",
 		"Pengingat Shalat WhatsApp",
 		"Prayer Reminder",
 		"Hisab Kemenag",
+		"Waktu Shalat Ponorogo",
 	],
-	authors: [{ name: "UNIDA Gontor" }],
-	creator: "UNIDA Gontor",
+	authors: [
+		{
+			name: "Universitas Darussalam Gontor",
+			url: "https://unida.gontor.ac.id",
+		},
+	],
+	creator: "Universitas Darussalam Gontor",
+	publisher: "Universitas Darussalam Gontor",
+	applicationName: "UNIDA Prayer",
 	alternates: {
 		canonical: "/",
 	},
@@ -110,8 +122,30 @@ const jsonLd = {
 			"@id": `${cleanAppUrl}/#website`,
 			url: cleanAppUrl,
 			name: "UNIDA Prayer",
+			alternateName: [
+				"Jadwal Shalat UNIDA Gontor",
+				"UNIDA Prayer Bot",
+			],
 			description:
 				"Jadwal shalat harian akurat kampus Universitas Darussalam Gontor dan bot pengingat WhatsApp",
+			inLanguage: "id-ID",
+			publisher: {
+				"@id": "https://unida.gontor.ac.id/#organization",
+			},
+		},
+		{
+			"@type": "WebPage",
+			"@id": `${cleanAppUrl}/#webpage`,
+			url: cleanAppUrl,
+			name: "UNIDA Prayer — Jadwal Shalat Kampus Siman & Pengingat WhatsApp",
+			description:
+				"Jadwal shalat harian resmi dan akurat kampus Universitas Darussalam Gontor Siman serta bot pengingat waktu shalat via WhatsApp.",
+			isPartOf: {
+				"@id": `${cleanAppUrl}/#website`,
+			},
+			about: {
+				"@id": "https://unida.gontor.ac.id/#organization",
+			},
 			inLanguage: "id-ID",
 		},
 		{
@@ -119,6 +153,7 @@ const jsonLd = {
 			"@id": "https://unida.gontor.ac.id/#organization",
 			name: "Universitas Darussalam Gontor",
 			url: "https://unida.gontor.ac.id",
+			logo: `${cleanAppUrl}/unida-logo.png`,
 			address: {
 				"@type": "PostalAddress",
 				streetAddress: "Jl. Raya Siman Km 6",

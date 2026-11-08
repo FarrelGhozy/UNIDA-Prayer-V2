@@ -30,9 +30,9 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 						<CalendarDays className="h-5 w-5" />
 					</div>
 					<div>
-						<h3 className="text-sm font-bold text-[#102A46] sm:text-base dark:text-white">
+						<h2 className="text-sm font-bold text-[#102A46] sm:text-base dark:text-white">
 							Jadwal Shalat Mingguan
-						</h3>
+						</h2>
 						<p className="text-xs text-[#64748B] dark:text-slate-400">
 							Rangkuman hisab jadwal shalat 7 hari ke depan mulai besok
 						</p>

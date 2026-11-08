@@ -55,9 +55,9 @@ _UNIDA Prayer System V2.0_`;
 	return (
 		<div>
 			<div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl p-4 glass-panel glass-sheen">
-				<h3 className="text-sm font-bold text-[#102A46] sm:text-base dark:text-white">
+				<h2 className="text-sm font-bold text-[#102A46] sm:text-base dark:text-white">
 					Jadwal Shalat Hari Ini
-				</h3>
+				</h2>
 
 				<div className="flex items-center gap-2">
 					<button

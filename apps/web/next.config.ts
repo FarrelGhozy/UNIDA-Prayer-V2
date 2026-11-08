@@ -50,6 +50,33 @@ const nextConfig: NextConfig = {
 					},
 				],
 			},
+			{
+				source: "/(admin|login)/:path*",
+				headers: [
+					{
+						key: "X-Robots-Tag",
+						value: "noindex, nofollow, noarchive",
+					},
+				],
+			},
+			{
+				source: "/login",
+				headers: [
+					{
+						key: "X-Robots-Tag",
+						value: "noindex, nofollow, noarchive",
+					},
+				],
+			},
+			{
+				source: "/admin",
+				headers: [
+					{
+						key: "X-Robots-Tag",
+						value: "noindex, nofollow, noarchive",
+					},
+				],
+			},
 		];
 	},
 	// Nilai ini dibekukan saat `next build` ke routes-manifest. Image Docker

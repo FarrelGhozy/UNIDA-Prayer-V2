@@ -10,9 +10,9 @@ export function WhatsappBanner() {
 					</div>
 					<div className="space-y-1">
 						<div className="flex items-center gap-2">
-							<h4 className="text-base font-bold text-[#102A46] dark:text-white">
+							<h2 className="text-base font-bold text-[#102A46] dark:text-white">
 								Pengingat Otomatis WhatsApp Bot
-							</h4>
+							</h2>
 							<span className="rounded-full border border-emerald-400/30 bg-emerald-500/15 px-2.5 py-0.5 text-[10px] font-bold text-emerald-800 backdrop-blur-xs dark:text-emerald-300">
 								Aktif
 							</span>
