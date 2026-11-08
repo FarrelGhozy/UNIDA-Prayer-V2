@@ -151,13 +151,13 @@ export function DynamicPrayerBackground({
 
 	const defaultOverlay =
 		theme === "dark"
-			? "bg-linear-to-b from-[#06111D]/80 via-[#0A1B2E]/85 to-[#050C16]/98 backdrop-blur-[2px]"
+			? "bg-linear-to-b from-[#06111D]/65 via-[#0A1B2E]/50 to-[#0A1B2E]/75 backdrop-blur-[1px]"
 			: "bg-linear-to-b from-[#0A1B2E]/55 via-[#102A46]/35 to-[#F5F8FC]/95 backdrop-blur-[2px]";
 
 	return (
 		<aside
 			aria-label="Latar belakang kampus dinamis"
-			className="pointer-events-none fixed inset-0 -z-10 overflow-hidden"
+			className="pointer-events-none fixed inset-0 z-0 overflow-hidden"
 		>
 			{BACKGROUND_VARIANTS.map((variant) => {
 				const isActive = variant.key === activePhase;

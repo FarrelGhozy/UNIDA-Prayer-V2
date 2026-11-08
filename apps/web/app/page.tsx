@@ -79,7 +79,8 @@ export default function HomePage() {
 
 	// Tema otomatis: Terbit s.d. Maghrib = Terang, di luar itu = Gelap
 	const isDaytime = useMemo(() => {
-		const currentTime = (now ?? Date.now()) + serverSkewMs;
+		if (!now) return false;
+		const currentTime = now + serverSkewMs;
 		if (data?.times?.SUNRISE?.utc && data?.times?.MAGHRIB?.utc) {
 			const tSunrise = new Date(data.times.SUNRISE.utc).getTime();
 			const tMaghrib = new Date(data.times.MAGHRIB.utc).getTime();
@@ -161,7 +162,7 @@ export default function HomePage() {
 	);
 
 	return (
-		<div className={`relative flex min-h-screen flex-col transition-colors duration-700 ${theme === "dark" ? "dark bg-[#06111D] text-white" : "bg-transparent text-[#172B43]"}`}>
+		<div className={`relative flex min-h-screen flex-col transition-colors duration-700 bg-transparent ${theme === "dark" ? "dark text-white" : "text-[#172B43]"}`}>
 			<DynamicPrayerBackground
 				data={data}
 				now={now}
@@ -171,7 +172,7 @@ export default function HomePage() {
 
 			<Header liveTimeString={liveTimeString} theme={theme} />
 
-			<main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">
+			<main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8">
 				<div className="mx-auto max-w-5xl space-y-6 sm:space-y-8">
 					<CalendarBanner
 						locationName={data?.locationName ?? "UNIDA Gontor"}
