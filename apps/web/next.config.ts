@@ -52,9 +52,11 @@ const nextConfig: NextConfig = {
 			},
 		];
 	},
+	// Nilai ini dibekukan saat `next build` ke routes-manifest. Image Docker
+	// wajib di-build dengan build-arg INTERNAL_API_URL yang sesuai.
 	async rewrites() {
 		const apiUrl =
-			process.env.INTERNAL_API_URL || "http://127.0.0.1:3001";
+			process.env.INTERNAL_API_URL || "http://127.0.0.1:3511";
 		return [
 			{
 				source: "/api/:path*",

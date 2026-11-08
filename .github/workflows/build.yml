@@ -38,7 +38,7 @@ jobs:
       WAHA_SESSION: unida-prayer
       WEB_URL: http://localhost:3000
       CORS_ORIGINS: http://localhost:3000
-      INTERNAL_API_URL: http://127.0.0.1:3001
+      INTERNAL_API_URL: http://127.0.0.1:3511
       NEXT_PUBLIC_ADMIN_PATH: /admin
     steps:
       - name: Checkout Repository
@@ -95,6 +95,8 @@ jobs:
           context: .
           file: infrastructure/docker/web.Dockerfile
           push: true
+          build-args: |
+            INTERNAL_API_URL=http://api:3511
           tags: |
             ghcr.io/farrelghozy/unida-prayer-v2-web:latest
             ghcr.io/farrelghozy/unida-prayer-v2-web:${{ github.sha }}

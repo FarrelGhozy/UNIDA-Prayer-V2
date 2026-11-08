@@ -21,7 +21,7 @@ export function resolveApiUrl(endpoint: string): string {
 		process.env.NEXT_PUBLIC_API_URL ||
 		process.env.NEXT_PUBLIC_API_BASE_URL ||
 		(typeof window === "undefined"
-			? process.env.INTERNAL_API_URL || "http://127.0.0.1:3001"
+			? process.env.INTERNAL_API_URL || "http://127.0.0.1:3511"
 			: "")
 	).trim();
 

@@ -10,6 +10,9 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY package.json bun.lock tsconfig.json ./
 COPY apps/web ./apps/web
 WORKDIR /app/apps/web
+# Rewrite /api dibekukan saat build ke routes-manifest; env runtime tidak mengubahnya.
+ARG INTERNAL_API_URL=http://api:3511
+ENV INTERNAL_API_URL=$INTERNAL_API_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN bun run build
 
