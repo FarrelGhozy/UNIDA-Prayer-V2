@@ -4,7 +4,10 @@
 	"private": true,
 	"type": "module",
 	"scripts": {
-		"dev": "bun run src/index.ts",
+		"dev": "bun run src/dev-all.ts",
+		"dev:all": "bun run src/dev-all.ts",
+		"dev:api": "bun run src/index.ts",
+		"dev:worker": "bun run src/worker/index.ts",
 		"start": "bun run src/index.ts",
 		"worker": "bun run src/worker/index.ts",
 		"db:generate": "drizzle-kit generate",

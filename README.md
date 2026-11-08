@@ -146,18 +146,17 @@ bun run db:seed
 
 ### 5. Menjalankan Aplikasi
 
-Buka terminal terpisah untuk masing-masing servis atau gunakan perintah workspace:
+Cukup 2 terminal — `dev:api` sudah menggabungkan API + worker dalam 1 log:
 
 ```bash
-# Terminal 1: Backend API Elysia (port 3001)
+# Terminal 1: Backend API Elysia (port 3001) + Worker Scheduler (1 log gabungan)
 bun run dev:api
 
-# Terminal 2: Background Scheduler Worker
-bun run worker
-
-# Terminal 3: Frontend Next.js Web (port 3000)
+# Terminal 2: Frontend Next.js Web (port 3000)
 bun run dev:web
 ```
+
+Butuh debug pisah? Pakai `bun run dev:api:only` (API saja) dan `bun run worker` (worker saja).
 
 Akses landing page di [http://localhost:3000](http://localhost:3000) dan portal admin di [http://localhost:3000/login](http://localhost:3000/login).
 
@@ -175,9 +174,10 @@ Semua script dikelola dari root `package.json`:
 | `bun run build` | Melakukan build production (API TypeScript + Next.js Turbopack) |
 | `bun run db:migrate` | Menerapkan migrasi Drizzle ke database MySQL |
 | `bun run db:seed` | Mengisi data admin utama & hadits awal |
-| `bun run dev:api` | Menjalankan server API Elysia dalam mode watch/dev |
+| `bun run dev:api` | Menjalankan API Elysia + worker scheduler gabungan dalam 1 log |
+| `bun run dev:api:only` | Menjalankan server API Elysia saja (tanpa worker, untuk debug) |
 | `bun run dev:web` | Menjalankan server web Next.js dalam mode development |
-| `bun run worker` | Menjalankan worker scheduler background |
+| `bun run worker` | Menjalankan worker scheduler background saja (untuk debug pisah) |
 
 ---
 

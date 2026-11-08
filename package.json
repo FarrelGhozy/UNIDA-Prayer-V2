@@ -17,7 +17,8 @@
 		"build:web": "cd apps/web && bun run build",
 		"db:migrate": "cd apps/api && bun run db:migrate",
 		"db:seed": "cd apps/api && bun run db:seed",
-		"dev:api": "cd apps/api && bun run dev",
+		"dev:api": "cd apps/api && bun run dev:all",
+		"dev:api:only": "cd apps/api && bun run dev:api",
 		"dev:web": "cd apps/web && bun run dev",
 		"worker": "cd apps/api && bun run worker"
 	},
