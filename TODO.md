@@ -58,7 +58,7 @@
 
 ## Fase 6 — CI/CD + Production
 
-- [x] Workflow `build.yml`: PR check-only; push main → push GHCR `ghcr.io/FarrelGhozy/unida-prayer-web|api` (`latest`+SHA)
+- [x] Workflow `build.yml`: PR check-only; push main → push GHCR `ghcr.io/farrelghozy/unida-prayer-v2-web|api` (`latest`+SHA)
 - [x] Pull + `db:migrate` + `db:seed` (awal) + `up -d` di home server; healthcheck; backup WAHA volume + MySQL (terdokumentasi di `docs/10`, `docs/14`, `deploy/compose.yml`)
 - [x] Uji: restart container, recovery worker, test-message pasca-update, rollback SHA
 

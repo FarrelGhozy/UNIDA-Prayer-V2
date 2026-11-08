@@ -14,7 +14,7 @@ Contoh acuan (OWNER `farrelghozy`, WAHA `gows-2026.10.1`; domain/proxy ditunda):
 ```yaml
 services:
   web:
-    image: ghcr.io/OWNER/unida-prayer-web:latest
+    image: ghcr.io/OWNER/unida-prayer-v2-web:latest
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -25,13 +25,13 @@ services:
     depends_on:
       - api
   api:
-    image: ghcr.io/OWNER/unida-prayer-api:latest
+    image: ghcr.io/OWNER/unida-prayer-v2-api:latest
     restart: unless-stopped
     env_file: [.env]
     expose: ["3001"]
     depends_on: [waha]
   worker:
-    image: ghcr.io/OWNER/unida-prayer-api:latest
+    image: ghcr.io/OWNER/unida-prayer-v2-api:latest
     command: ["bun", "run", "worker"]
     restart: unless-stopped
     env_file: [.env]
@@ -57,8 +57,8 @@ Aturan:
 
 ## 10.2 Image (2 image)
 
-- `ghcr.io/OWNER/unida-prayer-web:<sha|latest>` dari `infrastructure/docker/web.Dockerfile` (Node standalone).
-- `ghcr.io/OWNER/unida-prayer-api:<sha|latest>` dari `infrastructure/docker/api.Dockerfile` (Bun).
+- `ghcr.io/OWNER/unida-prayer-v2-web:<sha|latest>` dari `infrastructure/docker/web.Dockerfile` (Node standalone).
+- `ghcr.io/OWNER/unida-prayer-v2-api:<sha|latest>` dari `infrastructure/docker/api.Dockerfile` (Bun).
 - Worker = image API + `bun run worker`.
 - Tag ganda: `latest` + commit SHA (SHA untuk rollback presisi).
 

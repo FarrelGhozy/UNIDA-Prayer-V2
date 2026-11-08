@@ -96,8 +96,8 @@ jobs:
           file: infrastructure/docker/web.Dockerfile
           push: true
           tags: |
-            ghcr.io/farrelghozy/unida-prayer-web:latest
-            ghcr.io/farrelghozy/unida-prayer-web:${{ github.sha }}
+            ghcr.io/farrelghozy/unida-prayer-v2-web:latest
+            ghcr.io/farrelghozy/unida-prayer-v2-web:${{ github.sha }}
 
       - name: Build and Push API Image
         uses: docker/build-push-action@v5
@@ -106,5 +106,5 @@ jobs:
           file: infrastructure/docker/api.Dockerfile
           push: true
           tags: |
-            ghcr.io/farrelghozy/unida-prayer-api:latest
-            ghcr.io/farrelghozy/unida-prayer-api:${{ github.sha }}
+            ghcr.io/farrelghozy/unida-prayer-v2-api:latest
+            ghcr.io/farrelghozy/unida-prayer-v2-api:${{ github.sha }}

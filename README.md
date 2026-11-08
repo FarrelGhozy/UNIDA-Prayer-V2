@@ -186,8 +186,8 @@ Semua script dikelola dari root `package.json`:
 ### 1. CI/CD Otomatis
 
 Setiap commit ke branch `main` akan diuji secara otomatis oleh GitHub Actions (`.github/workflows/build.yml`) yang mencakup linting, typecheck, dan unit testing. Jika lulus, CI akan membangun image multi-platform dan mempublikasikannya ke GitHub Container Registry:
-- `ghcr.io/FarrelGhozy/unida-prayer-web`
-- `ghcr.io/FarrelGhozy/unida-prayer-api`
+- `ghcr.io/farrelghozy/unida-prayer-v2-web`
+- `ghcr.io/farrelghozy/unida-prayer-v2-api`
 
 ### 2. Update Manual di Home Server
 

@@ -1,6 +1,6 @@
 services:
   web:
-    image: ghcr.io/farrelghozy/unida-prayer-web:latest
+    image: ghcr.io/farrelghozy/unida-prayer-v2-web:latest
     restart: unless-stopped
     environment:
       NODE_ENV: production
@@ -12,7 +12,7 @@ services:
       - api
 
   api:
-    image: ghcr.io/farrelghozy/unida-prayer-api:latest
+    image: ghcr.io/farrelghozy/unida-prayer-v2-api:latest
     restart: unless-stopped
     env_file:
       - ../.env
@@ -28,7 +28,7 @@ services:
       start_period: 20s
 
   worker:
-    image: ghcr.io/farrelghozy/unida-prayer-api:latest
+    image: ghcr.io/farrelghozy/unida-prayer-v2-api:latest
     command: ["bun", "run", "src/worker/index.ts"]
     restart: unless-stopped
     env_file:
