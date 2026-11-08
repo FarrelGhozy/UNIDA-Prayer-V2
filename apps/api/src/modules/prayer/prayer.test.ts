@@ -3,6 +3,7 @@ import {
 	getPublicSettings,
 	getResolvedSettings,
 	getTodayPrayer,
+	getWeeklyPrayer,
 	previewPrayerTimes,
 } from "./service";
 
@@ -58,5 +59,15 @@ describe("apps/api/modules/prayer", () => {
 		expect(preview.input.latitude).toBe(-6.2);
 		expect(preview.input.adjustmentsMinutes?.FAJR).toBe(3);
 		expect(preview.times.FAJR.time24).toBeDefined();
+	});
+
+	it("menghitung jadwal mingguan (7 hari)", async () => {
+		const week = await getWeeklyPrayer("2026-11-04");
+		expect(week.locationName).toBe("UNIDA Gontor");
+		expect(week.days.length).toBe(7);
+		expect(week.days[0]?.dateLocal).toBe("2026-11-04");
+		expect(week.days[6]?.dateLocal).toBe("2026-11-10");
+		expect(week.days[0]?.times.fajr).toMatch(/^\d{2}:\d{2}$/);
+		expect(week.days[0]?.hijri.formatted).toBeDefined();
 	});
 });

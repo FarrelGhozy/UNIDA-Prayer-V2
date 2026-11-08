@@ -207,6 +207,111 @@ export async function getNextPrayerOnly(): Promise<{
 	};
 }
 
+export interface WeeklyPrayerDay {
+	dateLocal: string;
+	dayName: string;
+	dayFormatted: string;
+	isToday: boolean;
+	isFriday: boolean;
+	hijri: HijriDateInfo;
+	times: {
+		fajr: string;
+		sunrise: string;
+		dhuhr: string;
+		asr: string;
+		maghrib: string;
+		isha: string;
+	};
+}
+
+export interface WeeklyPrayerResponse {
+	locationName: string;
+	timezone: string;
+	startDate: string;
+	days: WeeklyPrayerDay[];
+}
+
+export async function getWeeklyPrayer(
+	startDateQuery?: string,
+): Promise<WeeklyPrayerResponse> {
+	const settings = await getResolvedSettings();
+	const now = new Date();
+	const todayDateLocal = formatInTimeZone(
+		now,
+		settings.location.timezone,
+		"yyyy-MM-dd",
+	);
+
+	const baseDateLocal =
+		startDateQuery && /^\d{4}-\d{2}-\d{2}$/.test(startDateQuery)
+			? startDateQuery
+			: todayDateLocal;
+
+	const parts = baseDateLocal.split("-").map(Number);
+	const y = parts[0] as number;
+	const m = parts[1] as number;
+	const d = parts[2] as number;
+	const days: WeeklyPrayerDay[] = [];
+
+	for (let i = 0; i < 7; i++) {
+		const dateObj = new Date(Date.UTC(y, m - 1, d + i, 5, 0, 0));
+		const curDateLocal = formatInTimeZone(
+			dateObj,
+			settings.location.timezone,
+			"yyyy-MM-dd",
+		);
+
+		const engineInput: PrayerEngineInput = {
+			dateLocal: curDateLocal,
+			latitude: settings.location.latitude,
+			longitude: settings.location.longitude,
+			timezone: settings.location.timezone,
+			fajrAngle: settings.calculation.fajrAngle,
+			ishaAngle: settings.calculation.ishaAngle,
+			asrFactor: settings.calculation.asrFactor,
+			adjustmentsMinutes: settings.adjustments,
+		};
+
+		const prayerTimes = calcPrayerTimes(engineInput);
+		const hijri = formatHijri(curDateLocal, settings.hijri.adjustmentDays);
+
+		const dayName = new Intl.DateTimeFormat("id-ID", {
+			weekday: "long",
+			timeZone: settings.location.timezone,
+		}).format(dateObj);
+
+		const dayFormatted = new Intl.DateTimeFormat("id-ID", {
+			day: "numeric",
+			month: "short",
+			timeZone: settings.location.timezone,
+		}).format(dateObj);
+
+		days.push({
+			dateLocal: curDateLocal,
+			dayName,
+			dayFormatted,
+			isToday: curDateLocal === todayDateLocal,
+			isFriday: prayerTimes.isFriday,
+			hijri,
+			times: {
+				fajr: prayerTimes.times.FAJR.time24,
+				sunrise: prayerTimes.times.SUNRISE.time24,
+				dhuhr: prayerTimes.times.DHUHR.time24,
+				asr: prayerTimes.times.ASR.time24,
+				maghrib: prayerTimes.times.MAGHRIB.time24,
+				isha: prayerTimes.times.ISHA.time24,
+			},
+		});
+	}
+
+	return {
+		locationName: settings.location.name,
+		timezone: settings.location.timezone,
+		startDate: baseDateLocal,
+		days,
+	};
+}
+
 export async function getPublicSettings() {
 	const settings = await getResolvedSettings();
 	return {

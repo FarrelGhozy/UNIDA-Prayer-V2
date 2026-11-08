@@ -9,6 +9,15 @@ export const todayQuerySchema = t.Object({
 	),
 });
 
+export const weekQuerySchema = t.Object({
+	startDate: t.Optional(
+		t.String({
+			pattern: "^\\d{4}-\\d{2}-\\d{2}$",
+			description: "Tanggal awal lokal YYYY-MM-DD",
+		}),
+	),
+});
+
 export const previewBodySchema = t.Object({
 	dateLocal: t.Optional(
 		t.String({
