@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { afterAll, beforeEach, describe, expect, it } from "bun:test";
 import { NextRequest } from "next/server";
 import { middleware } from "./middleware";
 
@@ -13,6 +13,25 @@ function makeTestSessionToken(expiresAtOffsetMs = 86400000): string {
 
 describe("middleware secret admin routing", () => {
 	const originalAdminPath = process.env.NEXT_PUBLIC_ADMIN_PATH;
+	const originalLoginPath = process.env.NEXT_PUBLIC_LOGIN_PATH;
+
+	beforeEach(() => {
+		// Isolasi dari .env lokal yang mungkin memakai login path kustom.
+		delete process.env.NEXT_PUBLIC_LOGIN_PATH;
+	});
+
+	afterAll(() => {
+		if (originalAdminPath === undefined) {
+			delete process.env.NEXT_PUBLIC_ADMIN_PATH;
+		} else {
+			process.env.NEXT_PUBLIC_ADMIN_PATH = originalAdminPath;
+		}
+		if (originalLoginPath === undefined) {
+			delete process.env.NEXT_PUBLIC_LOGIN_PATH;
+		} else {
+			process.env.NEXT_PUBLIC_LOGIN_PATH = originalLoginPath;
+		}
+	});
 
 	it("memblokir /admin dan /login langsung (404) bila kustom path diatur", () => {
 		process.env.NEXT_PUBLIC_ADMIN_PATH = "/pengurus-siman";
@@ -145,12 +164,5 @@ describe("middleware secret admin routing", () => {
 		const res = middleware(req);
 		expect(res.headers.get("x-middleware-rewrite")).toBeNull();
 		expect(res.status).toBe(200);
-
-		// Restore env tanpa meninggalkan string "undefined" bila awalnya tak disetel.
-		if (originalAdminPath === undefined) {
-			delete process.env.NEXT_PUBLIC_ADMIN_PATH;
-		} else {
-			process.env.NEXT_PUBLIC_ADMIN_PATH = originalAdminPath;
-		}
 	});
 });
