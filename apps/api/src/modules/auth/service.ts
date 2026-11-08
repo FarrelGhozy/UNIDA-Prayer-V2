@@ -33,8 +33,7 @@ function signPayload(payload: string, passwordHash: string): string {
 	return crypto
 		.createHmac("sha256", config.appSecret)
 		.update(`${payload}.${passwordHash}`)
-		.digest("hex")
-		.slice(0, 32);
+		.digest("hex");
 }
 
 function generateSessionToken(adminId: number, passwordHash: string): string {

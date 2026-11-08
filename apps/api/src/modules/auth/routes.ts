@@ -2,6 +2,7 @@ import { fail, ok, type ErrorCode } from "@unida-prayer/shared";
 import { Elysia } from "elysia";
 import { config } from "../../core/config";
 import { SESSION_COOKIE_NAME } from "./guard";
+import { loginRateLimiter } from "./rate-limit";
 import { changePasswordBodySchema, loginBodySchema } from "./schema";
 import {
 	AuthError,
@@ -14,9 +15,26 @@ import {
 export const authRoutes = new Elysia({ prefix: "/api/auth" })
 	.post(
 		"/login",
-		async ({ body, cookie, status }) => {
+		async ({ body, cookie, headers, status }) => {
+			const forwarded = headers["x-forwarded-for"];
+			const clientIp = (forwarded ? forwarded.split(",")[0]?.trim() : undefined) || headers["x-real-ip"] || "127.0.0.1";
+			const rateLimitKey = `${clientIp}:${body.email.trim().toLowerCase()}`;
+
+			const check = loginRateLimiter.isBlocked(rateLimitKey);
+			if (check.blocked) {
+				const waitMin = Math.max(1, Math.ceil(check.remainingWaitMs / 60000));
+				return status(
+					429,
+					fail(
+						"RATE_LIMITED",
+						`Terlalu banyak percobaan login yang gagal. Silakan coba lagi dalam ${waitMin} menit.`,
+					),
+				);
+			}
+
 			try {
 				const { admin, token } = await loginAdmin(body.email, body.password);
+				loginRateLimiter.recordSuccess(rateLimitKey);
 
 				const sessionCookie = cookie[SESSION_COOKIE_NAME];
 				sessionCookie?.set({
@@ -31,6 +49,7 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
 				return ok(admin);
 			} catch (error) {
 				if (error instanceof AuthError) {
+					loginRateLimiter.recordFailure(rateLimitKey);
 					return status(error.statusCode, fail(error.code as ErrorCode, error.message));
 				}
 				throw error;

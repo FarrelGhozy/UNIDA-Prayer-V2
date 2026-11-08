@@ -25,6 +25,34 @@ function required(name: string): string {
 	return value;
 }
 
+function validateAppSecret(isProduction: boolean): string {
+	const value = process.env.APP_SECRET;
+	if (!value || value.trim().length === 0) {
+		throw new Error(
+			"Environment APP_SECRET belum diisi. Salin .env.example menjadi .env lalu isi nilainya.",
+		);
+	}
+	const trimmed = value.trim();
+	if (isProduction) {
+		if (trimmed.length < 32) {
+			throw new Error(
+				`Environment APP_SECRET terlalu pendek untuk mode produksi (${trimmed.length} karakter). Wajib minimal 32 karakter acak.`,
+			);
+		}
+		const lower = trimmed.toLowerCase();
+		if (
+			lower.includes("change-me") ||
+			lower.includes("change_me") ||
+			lower.includes("secret-min-32-chars")
+		) {
+			throw new Error(
+				"Environment APP_SECRET di mode produksi masih menggunakan nilai default contoh. Ganti dengan string acak aman.",
+			);
+		}
+	}
+	return trimmed;
+}
+
 function optional(name: string, fallback: string): string {
 	const value = process.env[name];
 	return value && value.trim().length > 0 ? value : fallback;
@@ -73,7 +101,7 @@ export const config: AppConfig = {
 	// Image Docker memaksa NODE_ENV=production sehingga bypass mati otomatis di server.
 	isDev: nodeEnv !== "production",
 	port: port("API_PORT", 3001),
-	appSecret: required("APP_SECRET"),
+	appSecret: validateAppSecret(nodeEnv === "production"),
 	databaseUrl: required("DATABASE_URL"),
 	wahaBaseUrl: optional("WAHA_BASE_URL", "http://localhost:3000"),
 	wahaApiKey: optional("WAHA_API_KEY", ""),
@@ -83,6 +111,9 @@ export const config: AppConfig = {
 		const fromEnv = csvList("CORS_ORIGINS");
 		if (fromEnv.length > 0) return fromEnv;
 		const webUrl = optional("WEB_URL", "http://localhost:3000").replace(/\/+$/, "");
+		if (nodeEnv === "production") {
+			return [webUrl];
+		}
 		const defaults = [webUrl, "http://localhost:3000", "http://127.0.0.1:3000"];
 		return [...new Set(defaults)];
 	})(),
