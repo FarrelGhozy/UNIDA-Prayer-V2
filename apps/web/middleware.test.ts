@@ -46,6 +46,28 @@ describe("middleware secret admin routing", () => {
 		expect(res.headers.get("x-middleware-rewrite")).toContain("/admin");
 	});
 
+	it("mendukung kustom NEXT_PUBLIC_LOGIN_PATH yang terpisah dari admin path", () => {
+		process.env.NEXT_PUBLIC_ADMIN_PATH = "/pengurus-siman";
+		process.env.NEXT_PUBLIC_LOGIN_PATH = "/gerbang-rahasia";
+
+		// Default /login diblokir
+		const reqLogin = new NextRequest("http://localhost:3000/login");
+		expect(middleware(reqLogin).status).toBe(404);
+
+		// Akses /gerbang-rahasia di-rewrite ke form /login
+		const reqCustomLogin = new NextRequest("http://localhost:3000/gerbang-rahasia");
+		const resCustomLogin = middleware(reqCustomLogin);
+		expect(resCustomLogin.headers.get("x-middleware-rewrite")).toContain("/login");
+
+		// Akses admin tanpa cookie me-redirect ke /gerbang-rahasia
+		const reqAdmin = new NextRequest("http://localhost:3000/pengurus-siman");
+		const resAdmin = middleware(reqAdmin);
+		expect(resAdmin.status).toBe(307);
+		expect(resAdmin.headers.get("location")).toContain("/gerbang-rahasia");
+
+		delete process.env.NEXT_PUBLIC_LOGIN_PATH;
+	});
+
 	it("me-rewrite subpath kustom (mis. /prayer) ke /admin/prayer", () => {
 		process.env.NEXT_PUBLIC_ADMIN_PATH = "/pengurus-siman";
 
