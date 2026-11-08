@@ -33,7 +33,7 @@ Sistem ini memadukan **Landing Page Publik** berdesain modern, **Dashboard Admin
 
 ---
 
-## ✨ Fitur Utama
+## 🎯 Fitur Utama
 
 - **Jadwal Shalat Akurat Kampus Siman**: Hisab astronomis lokal (lat −7.8652, lng 111.4617) dengan rujukan Kementerian Agama RI (Subuh 20°, Isya 18°, Madzhab Syafi'i) + kalender Umm al-Qura.
 - **Landing Page Publik Informatif**:
