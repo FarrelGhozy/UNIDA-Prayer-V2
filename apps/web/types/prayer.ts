@@ -52,6 +52,7 @@ export interface WeeklyPrayerDay {
 	dayName: string;
 	dayFormatted: string;
 	isToday: boolean;
+	isTomorrow?: boolean;
 	isFriday: boolean;
 	hijri: HijriDateInfo;
 	times: {

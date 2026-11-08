@@ -212,6 +212,7 @@ export interface WeeklyPrayerDay {
 	dayName: string;
 	dayFormatted: string;
 	isToday: boolean;
+	isTomorrow: boolean;
 	isFriday: boolean;
 	hijri: HijriDateInfo;
 	times: {
@@ -242,10 +243,16 @@ export async function getWeeklyPrayer(
 		"yyyy-MM-dd",
 	);
 
+	const tomorrowDateLocal = formatInTimeZone(
+		new Date(now.getTime() + 24 * 60 * 60 * 1000),
+		settings.location.timezone,
+		"yyyy-MM-dd",
+	);
+
 	const baseDateLocal =
 		startDateQuery && /^\d{4}-\d{2}-\d{2}$/.test(startDateQuery)
 			? startDateQuery
-			: todayDateLocal;
+			: tomorrowDateLocal;
 
 	const parts = baseDateLocal.split("-").map(Number);
 	const y = parts[0] as number;
@@ -291,6 +298,7 @@ export async function getWeeklyPrayer(
 			dayName,
 			dayFormatted,
 			isToday: curDateLocal === todayDateLocal,
+			isTomorrow: curDateLocal === tomorrowDateLocal,
 			isFriday: prayerTimes.isFriday,
 			hijri,
 			times: {

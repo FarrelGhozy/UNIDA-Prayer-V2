@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, Sparkles } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import type { WeeklyPrayerDay } from "../../types/prayer";
 
 interface WeeklyPrayerTableProps {
@@ -24,7 +24,7 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 
 	return (
 		<div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#0D2137]/90">
-			<div className="flex flex-col gap-1 border-b border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between dark:border-white/10">
+			<div className="border-b border-slate-100 px-5 py-4 dark:border-white/10">
 				<div className="flex items-center gap-2.5">
 					<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-[#1D5FA7] dark:bg-blue-900/40 dark:text-[#6BA9D8]">
 						<CalendarDays className="h-5 w-5" />
@@ -34,14 +34,10 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 							Jadwal Shalat Mingguan
 						</h3>
 						<p className="text-xs text-[#64748B] dark:text-slate-400">
-							Rangkuman hisab jadwal shalat selama 7 hari ke depan
+							Rangkuman hisab jadwal shalat 7 hari ke depan mulai besok
 						</p>
 					</div>
 				</div>
-				<span className="inline-flex items-center gap-1.5 self-start sm:self-auto rounded-full bg-blue-50 px-3 py-1 text-[11px] font-semibold text-[#1D5FA7] dark:bg-white/10 dark:text-[#6BA9D8]">
-					<Sparkles className="h-3 w-3" />
-					7 Hari Lengkap
-				</span>
 			</div>
 
 			<div className="overflow-x-auto">
@@ -63,7 +59,7 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 								<tr
 									key={day.dateLocal}
 									className={`transition ${
-										day.isToday
+										day.isTomorrow
 											? "bg-blue-50/70 font-semibold dark:bg-[#123B6D]/40"
 											: "hover:bg-slate-50/70 dark:hover:bg-white/5"
 									}`}
@@ -75,9 +71,9 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 													<span className="font-bold text-[#102A46] dark:text-white">
 														{day.dayName}, {day.dayFormatted}
 													</span>
-													{day.isToday && (
+													{day.isTomorrow && (
 														<span className="rounded-md bg-[#1D5FA7] px-1.5 py-0.5 text-[10px] font-bold text-white shadow-2xs">
-															Hari Ini
+															Besok
 														</span>
 													)}
 												</div>

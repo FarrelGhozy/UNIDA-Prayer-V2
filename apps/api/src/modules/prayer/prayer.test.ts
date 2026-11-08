@@ -69,5 +69,9 @@ describe("apps/api/modules/prayer", () => {
 		expect(week.days[6]?.dateLocal).toBe("2026-11-10");
 		expect(week.days[0]?.times.fajr).toMatch(/^\d{2}:\d{2}$/);
 		expect(week.days[0]?.hijri.formatted).toBeDefined();
+
+		const defaultWeek = await getWeeklyPrayer();
+		expect(defaultWeek.days.length).toBe(7);
+		expect(defaultWeek.days[0]?.isTomorrow).toBe(true);
 	});
 });
