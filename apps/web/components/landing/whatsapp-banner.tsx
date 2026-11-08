@@ -24,7 +24,7 @@ export function WhatsappBanner() {
 				</div>
 
 				<div className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-50/90 px-4 py-2.5 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-200">
-					<span>Terkoneksi Grup Kampus</span>
+					<span>Terkoneksi Grup</span>
 				</div>
 			</div>
 		</div>
