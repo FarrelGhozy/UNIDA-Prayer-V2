@@ -1,7 +1,7 @@
 import {
 	Check,
 	Edit2,
-	MessageSquare,
+	Power,
 	RefreshCw,
 	Users,
 	X,
@@ -74,7 +74,7 @@ export function TargetTable({
 						<th className="py-3 px-4">Nama Grup / Target</th>
 						<th className="py-3 px-4">WhatsApp Chat ID</th>
 						<th className="py-3 px-4 w-32 text-center">Status Penerima</th>
-						<th className="py-3 px-4 w-28 text-right">Aksi</th>
+						<th className="py-3 px-4 w-36 text-right">Aksi</th>
 					</tr>
 				</thead>
 				<tbody className="divide-y divide-slate-100 text-[#172B43]">
@@ -131,23 +131,34 @@ export function TargetTable({
 							</td>
 
 							<td className="py-3 px-4 text-center">
-								<button
-									type="button"
-									onClick={() => onToggleActive(target)}
-									className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-bold transition ${
-										target.isActive
-											? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/30 hover:bg-emerald-100"
-											: "bg-slate-100 text-slate-600 ring-1 ring-slate-300 hover:bg-slate-200"
-									}`}
-								>
-									{target.isActive ? "Aktif" : "Nonaktif"}
-								</button>
+								{target.isActive ? (
+									<span className="inline-flex items-center gap-1.5 rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-600/20">
+										<span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+										Aktif
+									</span>
+								) : (
+									<span className="inline-flex items-center gap-1.5 rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">
+										<span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
+										Nonaktif
+									</span>
+								)}
 							</td>
 
 							<td className="py-3 px-4 text-right">
-								<span className="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400">
-									<MessageSquare className="h-3 w-3" /> Group
-								</span>
+								<div className="flex items-center justify-end gap-2">
+									<button
+										type="button"
+										onClick={() => onToggleActive(target)}
+										className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition shadow-2xs ${
+											target.isActive
+												? "border border-amber-200/90 bg-amber-50/80 text-amber-800 hover:bg-amber-100/90"
+												: "border border-emerald-200/90 bg-emerald-50/80 text-emerald-800 hover:bg-emerald-100/90"
+										}`}
+									>
+										<Power className="h-3.5 w-3.5" />
+										<span>{target.isActive ? "Nonaktifkan" : "Aktifkan"}</span>
+									</button>
+								</div>
 							</td>
 						</tr>
 					))}
