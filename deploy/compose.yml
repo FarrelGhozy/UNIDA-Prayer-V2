@@ -6,6 +6,10 @@ services:
       NODE_ENV: production
       INTERNAL_API_URL: http://api:3001
       NEXT_PUBLIC_API_BASE_URL: /api
+      ADMIN_PATH: ${ADMIN_PATH:-/admin}
+      LOGIN_PATH: ${LOGIN_PATH:-/login}
+      NEXT_PUBLIC_ADMIN_PATH: ${NEXT_PUBLIC_ADMIN_PATH:-/admin}
+      NEXT_PUBLIC_LOGIN_PATH: ${NEXT_PUBLIC_LOGIN_PATH:-/login}
     ports:
       - "127.0.0.1:3000:3000"
     networks:
