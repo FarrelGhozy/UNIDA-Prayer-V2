@@ -23,10 +23,10 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 	}
 
 	return (
-		<div className="overflow-hidden rounded-3xl border border-slate-200/90 bg-white/95 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-[#0D2137]/90">
-			<div className="border-b border-slate-100 px-5 py-4 dark:border-white/10">
+		<div className="overflow-hidden rounded-3xl glass-panel glass-sheen">
+			<div className="border-b border-slate-200/40 px-5 py-4 dark:border-white/10">
 				<div className="flex items-center gap-2.5">
-					<div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 text-[#1D5FA7] dark:bg-blue-900/40 dark:text-[#6BA9D8]">
+					<div className="flex h-9 w-9 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-[#1D5FA7] shadow-[inset_0_1px_1px_rgba(255,255,255,0.6)] dark:border-sky-400/20 dark:bg-sky-500/15 dark:text-[#6BA9D8] dark:shadow-[inset_0_1px_1px_rgba(255,255,255,0.15)]">
 						<CalendarDays className="h-5 w-5" />
 					</div>
 					<div>
@@ -43,7 +43,7 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 			<div className="overflow-x-auto">
 				<table className="w-full min-w-[620px] text-left border-collapse text-xs">
 					<thead>
-						<tr className="border-b border-slate-100 bg-slate-50/80 text-[11px] font-bold text-slate-600 dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-300">
+						<tr className="border-b border-slate-200/40 bg-slate-50/50 text-[11px] font-bold text-slate-700 backdrop-blur-xs dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
 							<th className="py-3 px-4">Hari & Tanggal</th>
 							<th className="py-3 px-3 text-center">Subuh</th>
 							<th className="py-3 px-3 text-center">Terbit</th>
@@ -53,15 +53,15 @@ export function WeeklyPrayerTable({ days, loading }: WeeklyPrayerTableProps) {
 							<th className="py-3 px-3 text-center">Isya</th>
 						</tr>
 					</thead>
-					<tbody className="divide-y divide-slate-100 text-[#172B43] dark:divide-white/5 dark:text-slate-200">
+					<tbody className="divide-y divide-slate-200/40 text-[#102A46] dark:divide-white/5 dark:text-slate-200">
 						{days.map((day) => {
 							return (
 								<tr
 									key={day.dateLocal}
 									className={`transition ${
 										day.isTomorrow
-											? "bg-blue-50/70 font-semibold dark:bg-[#123B6D]/40"
-											: "hover:bg-slate-50/70 dark:hover:bg-white/5"
+											? "bg-blue-500/10 font-semibold border-l-4 border-[#1D5FA7] dark:bg-sky-500/15 dark:border-[#38BDF8]"
+											: "hover:bg-white/40 dark:hover:bg-white/5"
 									}`}
 								>
 									<td className="py-3.5 px-4">

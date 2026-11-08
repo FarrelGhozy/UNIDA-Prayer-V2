@@ -169,6 +169,30 @@ export default function HomePage() {
 				theme={theme}
 			/>
 
+			<div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
+				<div
+					className={`absolute -top-32 -right-32 h-[560px] w-[560px] rounded-full blur-[120px] transition-all duration-1000 ${
+						theme === "dark"
+							? "bg-blue-600/25 opacity-70"
+							: "bg-sky-400/25 opacity-75"
+					}`}
+				/>
+				<div
+					className={`absolute top-1/2 -left-44 h-[600px] w-[600px] -translate-y-1/2 rounded-full blur-[130px] transition-all duration-1000 ${
+						theme === "dark"
+							? "bg-emerald-500/15 opacity-60"
+							: "bg-teal-400/20 opacity-70"
+					}`}
+				/>
+				<div
+					className={`absolute -bottom-40 left-1/3 h-[520px] w-[520px] rounded-full blur-[120px] transition-all duration-1000 ${
+						theme === "dark"
+							? "bg-indigo-600/20 opacity-60"
+							: "bg-blue-400/15 opacity-60"
+					}`}
+				/>
+			</div>
+
 			<Header liveTimeString={liveTimeString} theme={theme} />
 
 			<main className="relative z-10 flex-1 px-4 py-6 sm:px-6 sm:py-8">
