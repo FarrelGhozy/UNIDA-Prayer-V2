@@ -30,13 +30,13 @@ export function NextPrayerHero({
 			<div className="pointer-events-none absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-[#6BA9D8]/20 blur-3xl" />
 
 			{/* Siluet Logo UNIDA Gontor di Pojok Kanan Bawah */}
-			<div className="pointer-events-none absolute -bottom-[40px] -right-5 h-[195px] w-[195px] sm:h-[248px] sm:w-[248px] opacity-15 select-none z-0">
+			<div className="pointer-events-none absolute -bottom-[40px] -right-5 h-[195px] w-[195px] sm:h-[248px] sm:w-[248px] opacity-[0.09] select-none z-0">
 				<Image
 					src="/unida-logo.png"
 					alt=""
 					fill
 					sizes="(max-width: 640px) 195px, 248px"
-					className="object-contain filter brightness-0 invert"
+					className="object-contain filter brightness-0 invert blur-[1px]"
 					priority
 				/>
 			</div>
