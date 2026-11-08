@@ -22,43 +22,43 @@ export function CalculationSettingsCard({
 	onChangeIshaAngle,
 }: CalculationSettingsCardProps) {
 	return (
-		<div className="rounded-3xl border border-slate-200/80 bg-white p-5 sm:p-6 shadow-2xs space-y-4">
-			<div className="flex items-center gap-2 border-b border-slate-100 pb-3">
-				<Compass className="h-4 w-4 text-[#1D5FA7]" />
-				<h2 className="text-sm font-bold text-[#102A46]">
+		<div className="rounded-3xl glass-panel glass-sheen p-5 sm:p-6 shadow-2xs space-y-4">
+			<div className="flex items-center gap-2 border-b border-slate-200/60 pb-3 dark:border-white/10">
+				<Compass className="h-4 w-4 text-[#1D5FA7] dark:text-[#6BA9D8]" />
+				<h2 className="text-sm font-bold text-[#102A46] dark:text-white">
 					Metode & Parameter Hisab
 				</h2>
 			</div>
 
 			<div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
 				<div>
-					<label className="block text-xs font-semibold text-[#102A46] mb-1">
+					<label className="block text-xs font-semibold text-[#102A46] mb-1 dark:text-slate-200">
 						Standar Metode:
 					</label>
 					<input
 						type="text"
 						value={methodLabel}
 						onChange={(e) => onChangeMethodLabel(e.target.value)}
-						className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none"
+						className="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-xs text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none dark:border-white/15 dark:bg-black/25 dark:text-white dark:focus:border-sky-400"
 					/>
 				</div>
 
 				<div>
-					<label className="block text-xs font-semibold text-[#102A46] mb-1">
+					<label className="block text-xs font-semibold text-[#102A46] mb-1 dark:text-slate-200">
 						Madzhab Waktu Ashar:
 					</label>
 					<select
 						value={asrFactor}
 						onChange={(e) => onChangeAsrFactor(Number(e.target.value) as 1 | 2)}
-						className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none"
+						className="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-xs text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none dark:border-white/15 dark:bg-black/25 dark:text-white dark:focus:border-sky-400"
 					>
-						<option value={1}>Syafi'i, Maliki, Hanbali (Bayangan 1x)</option>
-						<option value={2}>Hanafi (Bayangan 2x)</option>
+						<option value={1} className="dark:bg-[#0A1B2E]">Syafi'i, Maliki, Hanbali (Bayangan 1x)</option>
+						<option value={2} className="dark:bg-[#0A1B2E]">Hanafi (Bayangan 2x)</option>
 					</select>
 				</div>
 
 				<div>
-					<label className="block text-xs font-semibold text-[#102A46] mb-1">
+					<label className="block text-xs font-semibold text-[#102A46] mb-1 dark:text-slate-200">
 						Sudut Fajar / Subuh (derajat):
 					</label>
 					<input
@@ -66,13 +66,13 @@ export function CalculationSettingsCard({
 						step="0.1"
 						value={fajrAngle}
 						onChange={(e) => onChangeFajrAngle(Number.parseFloat(e.target.value))}
-						className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none"
+						className="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-xs text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none dark:border-white/15 dark:bg-black/25 dark:text-white dark:focus:border-sky-400"
 					/>
-					<p className="mt-1 text-[11px] text-[#64748B]">Kemenag RI: 20.0°</p>
+					<p className="mt-1 text-[11px] text-[#64748B] dark:text-slate-400">Kemenag RI: 20.0°</p>
 				</div>
 
 				<div>
-					<label className="block text-xs font-semibold text-[#102A46] mb-1">
+					<label className="block text-xs font-semibold text-[#102A46] mb-1 dark:text-slate-200">
 						Sudut Isya (derajat):
 					</label>
 					<input
@@ -80,9 +80,9 @@ export function CalculationSettingsCard({
 						step="0.1"
 						value={ishaAngle}
 						onChange={(e) => onChangeIshaAngle(Number.parseFloat(e.target.value))}
-						className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none"
+						className="w-full rounded-xl border border-slate-200/80 bg-white/80 px-3 py-2 text-xs text-[#172B43] focus:bg-white focus:border-[#1D5FA7] focus:outline-none dark:border-white/15 dark:bg-black/25 dark:text-white dark:focus:border-sky-400"
 					/>
-					<p className="mt-1 text-[11px] text-[#64748B]">Kemenag RI: 18.0°</p>
+					<p className="mt-1 text-[11px] text-[#64748B] dark:text-slate-400">Kemenag RI: 18.0°</p>
 				</div>
 			</div>
 		</div>

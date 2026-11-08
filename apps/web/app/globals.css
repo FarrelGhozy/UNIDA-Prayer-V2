@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Perbaikan integrasi Leaflet Map dengan Tailwind CSS preflight:
    Tailwind preflight menerapkan max-width: 100% pada img/svg yang merusak
    skala tile dan menyebabkan pin bergeser saat zoom in/out. */

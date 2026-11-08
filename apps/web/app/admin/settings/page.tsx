@@ -176,7 +176,7 @@ export default function AdminSettingsPage() {
 					type="button"
 					onClick={() => loadData()}
 					disabled={loading}
-					className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-[#102A46] shadow-2xs hover:bg-slate-50 transition"
+					className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-3.5 py-2.5 text-xs font-semibold text-[#102A46] shadow-2xs transition hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:bg-white/10"
 				>
 					<RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
 					<span>Perbarui Status</span>
@@ -219,11 +219,11 @@ export default function AdminSettingsPage() {
 								onChangeIncludeHadith={setIncludeHadith}
 							/>
 
-							<div className="flex justify-end rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-2xs backdrop-blur-md">
+							<div className="glass-panel glass-sheen flex justify-end rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-2xs backdrop-blur-md dark:border-white/10 dark:bg-[#0D1C2E]/80">
 								<button
 									type="submit"
 									disabled={saving}
-									className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-6 py-3 text-xs font-bold text-white shadow-xs hover:bg-[#1D5FA7] transition disabled:opacity-50"
+									className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-6 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-[#1D5FA7] disabled:opacity-50 dark:bg-[#1D5FA7] dark:hover:bg-[#2A75C6]"
 								>
 									<Save className="h-4 w-4" />
 									<span>{saving ? "Menyimpan..." : "Simpan Pengaturan"}</span>

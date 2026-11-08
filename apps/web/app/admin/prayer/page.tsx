@@ -228,7 +228,7 @@ export default function AdminPrayerPage() {
 					type="button"
 					onClick={() => setShowRecalcModal(true)}
 					disabled={recalculating || loading}
-					className="inline-flex items-center gap-2 rounded-xl bg-blue-50 px-3.5 py-2.5 text-xs font-semibold text-[#123B6D] border border-blue-200 hover:bg-blue-100 transition disabled:opacity-50"
+					className="inline-flex items-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-3.5 py-2.5 text-xs font-semibold text-[#123B6D] transition hover:bg-blue-100 disabled:opacity-50 dark:border-sky-400/30 dark:bg-sky-500/15 dark:text-[#6BA9D8] dark:hover:bg-sky-500/25"
 				>
 					<RotateCcw className={`h-4 w-4 ${recalculating ? "animate-spin" : ""}`} />
 					<span>{recalculating ? "Menghitung..." : "Hitung Ulang Jadwal (Recalculate)"}</span>
@@ -286,11 +286,11 @@ export default function AdminPrayerPage() {
 								onChangeHijriDays={setHijriAdjustmentDays}
 							/>
 
-							<div className="flex items-center justify-end rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-2xs backdrop-blur-md">
+							<div className="glass-panel glass-sheen flex items-center justify-end rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-2xs backdrop-blur-md dark:border-white/10 dark:bg-[#0D1C2E]/80">
 								<button
 									type="submit"
 									disabled={saving}
-									className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-6 py-3 text-xs font-bold text-white shadow-xs hover:bg-[#1D5FA7] transition disabled:opacity-50"
+									className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-6 py-3 text-xs font-bold text-white shadow-xs transition hover:bg-[#1D5FA7] disabled:opacity-50 dark:bg-[#1D5FA7] dark:hover:bg-[#2A75C6]"
 								>
 									<Save className="h-4 w-4" />
 									<span>{saving ? "Menyimpan..." : "Simpan Parameter Hisab"}</span>

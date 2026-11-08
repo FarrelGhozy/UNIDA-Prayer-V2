@@ -147,7 +147,7 @@ export default function TargetsPage() {
 					type="button"
 					onClick={handleSync}
 					disabled={syncing || loading}
-					className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-3.5 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#1D5FA7] transition disabled:opacity-50"
+					className="inline-flex items-center gap-2 rounded-xl bg-[#123B6D] px-3.5 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#1D5FA7] transition disabled:opacity-50 dark:bg-[#1D5FA7] dark:hover:bg-[#2563EB]"
 				>
 					<RefreshCw className={`h-4 w-4 ${syncing ? "animate-spin" : ""}`} />
 					<span>{syncing ? "Sinkronisasi..." : "Sinkronisasi Grup"}</span>
@@ -157,12 +157,12 @@ export default function TargetsPage() {
 			<ErrorBanner message={error} onClose={() => setError(null)} />
 			<SuccessBanner message={successMsg} onClose={() => setSuccessMsg(null)} />
 
-			<div className="flex items-center justify-between rounded-2xl bg-white/95 border border-slate-200/80 px-4 py-3 shadow-2xs text-xs font-medium text-slate-700">
+			<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-2xl glass-panel glass-sheen px-4 py-3 shadow-2xs text-xs font-medium text-slate-700 dark:text-slate-300">
 				<div>
-					Total terdaftar: <strong className="text-[#102A46]">{targets.length} grup</strong> • Aktif menerima pesan:{" "}
-					<strong className="text-emerald-700">{activeCount} grup</strong>
+					Total terdaftar: <strong className="text-[#102A46] dark:text-white">{targets.length} grup</strong> • Aktif menerima pesan:{" "}
+					<strong className="text-emerald-700 dark:text-emerald-400">{activeCount} grup</strong>
 				</div>
-				<div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#1D5FA7]">
+				<div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#1D5FA7] dark:text-[#6BA9D8]">
 					<ShieldCheck className="h-4 w-4" />
 					<span>Grup baru hasil sync default nonaktif</span>
 				</div>
@@ -175,7 +175,7 @@ export default function TargetsPage() {
 				onFilterChange={setFilterActive}
 			/>
 
-			<div className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-2xs">
+			<div className="overflow-hidden rounded-3xl glass-panel glass-sheen shadow-2xs">
 				<TargetTable
 					targets={filteredTargets}
 					loading={loading}
