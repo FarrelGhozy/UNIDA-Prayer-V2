@@ -2,6 +2,9 @@ FROM oven/bun:1.4.4 AS deps
 WORKDIR /app
 COPY package.json bun.lock ./
 COPY apps/web/package.json ./apps/web/
+COPY apps/api/package.json ./apps/api/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/prayer-engine/package.json ./packages/prayer-engine/
 RUN bun install --frozen-lockfile
 
 FROM oven/bun:1.4.4 AS builder
