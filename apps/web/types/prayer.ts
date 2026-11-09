@@ -23,6 +23,29 @@ export interface HijriDateInfo {
 	adjustmentDays: number;
 }
 
+export interface IqamahSettings {
+	enabled: boolean;
+	intervals: {
+		FAJR: number;
+		DHUHR: number;
+		ASR: number;
+		MAGHRIB: number;
+		ISHA: number;
+	};
+}
+
+export interface PublicWhatsappStatus {
+	state: "CONNECTED" | "DISCONNECTED" | "PAUSED";
+	activeGroupsCount: number;
+	preReminderMinutes: number;
+}
+
+export interface RandomHadithData {
+	id: number;
+	text: string;
+	source: string;
+}
+
 export interface TodayPrayerData {
 	locationName: string;
 	timezone: string;
@@ -43,6 +66,9 @@ export interface TodayPrayerData {
 	};
 	nextPrayer: NextPrayerInfo;
 	serverNowUtc: string;
+	iqamah?: IqamahSettings;
+	randomHadith?: RandomHadithData | null;
+	whatsappStatus?: PublicWhatsappStatus;
 }
 
 export type SlotStatus = "PASSED" | "CURRENT" | "NEXT" | "UPCOMING";
