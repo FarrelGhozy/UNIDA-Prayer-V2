@@ -1,8 +1,13 @@
 import { eq } from "drizzle-orm";
+import { createLogger } from "../../core/logger";
 import { utcNow } from "../../core/time";
 import { db } from "../../database/client";
+import { appSettings } from "../../database/schema/appSettings";
+import { scheduledMessages } from "../../database/schema/messages";
 import { messageTargets } from "../../database/schema/targets";
 import { getResolvedSettings } from "../prayer/service";
+
+const logger = createLogger("whatsapp-service");
 import {
 	getSessionQr,
 	getSessionStatus,
@@ -102,9 +107,69 @@ export async function syncGroups() {
 		);
 	}
 
+	const now = utcNow();
+	const meId = session.me?.id;
+	const currentJid = meId
+		? (meId.split(":")[0] ?? meId).replace("@s.whatsapp.net", "@c.us")
+		: null;
+
+	const accountRow = await db
+		.select()
+		.from(appSettings)
+		.where(eq(appSettings.key, "whatsapp_account"))
+		.limit(1);
+
+	const storedAccount = accountRow[0]?.value as { jid?: string } | undefined;
+	const storedJid = storedAccount?.jid;
+
+	let accountChanged = false;
+	if (storedJid && currentJid && storedJid !== currentJid) {
+		accountChanged = true;
+		logger.warn("Pergantian nomor WhatsApp terdeteksi. Membatalkan antrean dan membersihkan data target lama.", {
+			previousJid: storedJid,
+			newJid: currentJid,
+		});
+
+		// 1. Batalkan dan hapus seluruh scheduled messages untuk nomor lama
+		await db.delete(scheduledMessages);
+
+		// 2. Hapus seluruh target grup lama
+		await db.delete(messageTargets);
+	}
+
+	// Simpan identitas akun WA terhubung ke app_settings
+	if (currentJid) {
+		const accountData = {
+			jid: currentJid,
+			pushName: session.me?.pushName ?? "",
+			updatedAt: now.toISOString(),
+		};
+		await db
+			.insert(appSettings)
+			.values({ key: "whatsapp_account", value: accountData, updatedAt: now })
+			.onDuplicateKeyUpdate({ set: { value: accountData, updatedAt: now } });
+	}
+
 	const groups = await listGroups();
 	const existingRows = await db.select().from(messageTargets);
 	const existingMap = new Map(existingRows.map((r) => [r.targetId, r]));
+
+	// Bersihkan grup yang sudah keluar / tidak lagi ada di akun WAHA
+	const validGroupIds = new Set(groups.map((g) => g.id));
+	const removedGroupIds: number[] = [];
+	for (const row of existingRows) {
+		if (!validGroupIds.has(row.targetId)) {
+			removedGroupIds.push(row.id);
+		}
+	}
+	if (removedGroupIds.length > 0) {
+		for (const id of removedGroupIds) {
+			await db.delete(messageTargets).where(eq(messageTargets.id, id));
+		}
+		logger.info("Grup yang sudah tidak terdaftar di WhatsApp dibersihkan dari target.", {
+			count: removedGroupIds.length,
+		});
+	}
 
 	let newCount = 0;
 	let updatedCount = 0;
@@ -115,7 +180,7 @@ export async function syncGroups() {
 			if (existing.name !== group.name) {
 				await db
 					.update(messageTargets)
-					.set({ name: group.name, updatedAt: utcNow() })
+					.set({ name: group.name, updatedAt: now })
 					.where(eq(messageTargets.id, existing.id));
 				updatedCount += 1;
 			}
@@ -134,5 +199,8 @@ export async function syncGroups() {
 		totalSynced: groups.length,
 		newCount,
 		updatedCount,
+		removedCount: removedGroupIds.length,
+		accountChanged,
+		accountJid: currentJid,
 	};
 }

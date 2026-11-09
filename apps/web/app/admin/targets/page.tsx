@@ -50,6 +50,9 @@ export default function TargetsPage() {
 			totalSynced: number;
 			newCount: number;
 			updatedCount: number;
+			removedCount?: number;
+			accountChanged?: boolean;
+			accountJid?: string;
 		}>("/api/admin/whatsapp/groups/sync", {
 			method: "POST",
 		});
@@ -57,9 +60,15 @@ export default function TargetsPage() {
 		if (res.error) {
 			setError(res.error.message);
 		} else if (res.data) {
-			setSuccessMsg(
-				`Sinkronisasi selesai: ${res.data.totalSynced} grup terbaca (${res.data.newCount} baru, ${res.data.updatedCount} diperbarui). Grup baru berstatus nonaktif secara default.`,
-			);
+			if (res.data.accountChanged) {
+				setSuccessMsg(
+					`Nomor WhatsApp baru terdeteksi (${res.data.accountJid ?? "baru"}). Seluruh antrean dan data target akun lama telah dibersihkan. Sebanyak ${res.data.newCount} grup dari akun baru berhasil disinkronkan (berstatus nonaktif secara default).`,
+				);
+			} else {
+				setSuccessMsg(
+					`Sinkronisasi selesai: ${res.data.totalSynced} grup terbaca (${res.data.newCount} baru, ${res.data.updatedCount} diperbarui${res.data.removedCount ? `, ${res.data.removedCount} dibersihkan` : ""}). Grup baru berstatus nonaktif secara default.`,
+				);
+			}
 			await loadTargets();
 		}
 		setSyncing(false);
