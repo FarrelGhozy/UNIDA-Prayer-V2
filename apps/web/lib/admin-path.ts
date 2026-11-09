@@ -1,8 +1,9 @@
 /**
- * Konfigurasi rute path admin dan login dari environment variable.
+ * Konfigurasi rute path admin dan login dari environment variable / runtime cookies.
  * Mendukung deteksi dinamis di sisi klien (browser) sehingga bila NEXT_PUBLIC_ADMIN_PATH
- * diubah di .env atau server runtime, seluruh link subpath admin (/whatsapp, /prayer, dll.)
- * otomatis mengikuti URL yang sedang dibuka pengguna.
+ * atau NEXT_PUBLIC_LOGIN_PATH diatur pada production container (Docker GHCR image),
+ * seluruh link subpath admin (/whatsapp, /prayer, dll.) dan rute login otomatis
+ * sinkron 100% tanpa perlu rebuild image.
  */
 
 const KNOWN_ADMIN_SUBPATHS = [
@@ -17,73 +18,122 @@ const KNOWN_ADMIN_SUBPATHS = [
 
 export function normalizePath(raw: string | undefined): string | null {
 	const trimmed = (raw ?? "").trim();
-	if (!trimmed || trimmed === "undefined" || trimmed === "null") return null;
+	if (!trimmed || trimmed === "undefined" || trimmed === "null") {
+		return null;
+	}
 	const withSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 	return withSlash.replace(/\/+$/, "") || null;
 }
 
-export const ADMIN_BASE_PATH =
-	normalizePath(process.env.NEXT_PUBLIC_ADMIN_PATH || process.env.ADMIN_PATH) || "/admin";
+function getCookie(name: string): string | null {
+	if (typeof document === "undefined") return null;
+	const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${name}=([^;]*)`));
+	return match ? decodeURIComponent(match[1]) : null;
+}
 
-const customLogin = normalizePath(
-	process.env.NEXT_PUBLIC_LOGIN_PATH || process.env.LOGIN_PATH,
+export function getRuntimeAdminPath(): string {
+	const fromCookie = getCookie("unida_admin_path");
+	if (fromCookie) {
+		const norm = normalizePath(fromCookie);
+		if (norm) return norm;
+	}
+	return (
+		normalizePath(process.env.ADMIN_PATH || process.env.NEXT_PUBLIC_ADMIN_PATH) ||
+		"/admin"
+	);
+}
+
+function getExplicitCustomLogin(): string | null {
+	const fromCookie = getCookie("unida_login_path");
+	if (fromCookie) {
+		const norm = normalizePath(fromCookie);
+		if (norm && norm !== "/login") return norm;
+	}
+	const customLogin = normalizePath(
+		process.env.LOGIN_PATH || process.env.NEXT_PUBLIC_LOGIN_PATH,
+	);
+	if (customLogin && customLogin !== "/login") {
+		return customLogin;
+	}
+	return null;
+}
+
+export function getRuntimeLoginPath(currentPathname?: string): string {
+	const explicitLogin = getExplicitCustomLogin();
+	if (explicitLogin) {
+		return explicitLogin;
+	}
+	const adminBase = resolveAdminBase(currentPathname);
+	return adminBase !== "/admin" ? `${adminBase}/login` : "/login";
+}
+
+export const ADMIN_BASE_PATH =
+	normalizePath(process.env.ADMIN_PATH || process.env.NEXT_PUBLIC_ADMIN_PATH) ||
+	"/admin";
+
+const customLoginEnv = normalizePath(
+	process.env.LOGIN_PATH || process.env.NEXT_PUBLIC_LOGIN_PATH,
 );
 
 export const LOGIN_ROUTE =
-	customLogin && customLogin !== "/login"
-		? customLogin
+	customLoginEnv && customLoginEnv !== "/login"
+		? customLoginEnv
 		: ADMIN_BASE_PATH !== "/admin"
 			? `${ADMIN_BASE_PATH}/login`
 			: "/login";
 
 /**
  * Menyelesaikan base path admin aktif secara runtime.
- * Prioritas:
- * 1. currentPathname eksplisit (misal dari hook usePathname() di Next.js)
- * 2. URL browser (window.location.pathname) saat dijalankan di client
- * 3. Fallback ke ADMIN_BASE_PATH (dari env atau default /admin)
+ * Menghindari jebakan salah mengira rute login kustom sebagai admin base.
  */
 export function resolveAdminBase(currentPathname?: string): string {
-	const envBase =
-		normalizePath(process.env.NEXT_PUBLIC_ADMIN_PATH || process.env.ADMIN_PATH) ||
-		"/admin";
+	const envBase = getRuntimeAdminPath();
+	const explicitLogin = getExplicitCustomLogin();
 
 	const path =
 		currentPathname ??
 		(typeof window !== "undefined" ? window.location.pathname : "");
+	const cleanPath = normalizePath(path);
 
-	const cleanPath = path
-		? (path.startsWith("/") ? path : `/${path}`).replace(/\/+$/, "")
-		: "";
-
-	if (!cleanPath || cleanPath === "/") {
+	if (!cleanPath) {
 		return envBase;
 	}
 
-	// Deteksi bila URL adalah salah satu subpath login (mis. /pengurus-siman/login -> /pengurus-siman)
-	if (cleanPath === "/login") {
+	// Bila URL saat ini adalah rute login aktif (mis. /masuk88 atau /login),
+	// base admin-nya adalah envBase, JANGAN kembalikan rute login!
+	if (cleanPath === "/login" || (explicitLogin && cleanPath === explicitLogin)) {
+		return envBase;
+	}
+
+	// Deteksi bila URL adalah format subpath login di bawah admin (mis. /opop/login -> /opop)
+	if (cleanPath.endsWith("/login")) {
+		const prefix = cleanPath.slice(0, -"/login".length);
+		if (prefix) return prefix;
 		return envBase;
 	}
 
 	for (const sub of KNOWN_ADMIN_SUBPATHS) {
-		if (cleanPath.endsWith(sub)) {
+		if (sub !== "/login" && cleanPath.endsWith(sub)) {
 			const prefix = cleanPath.slice(0, -sub.length);
 			if (prefix) return prefix;
 		}
 	}
 
-	// Jika pathname cocok dengan envBase
 	if (envBase !== "/admin" && cleanPath.startsWith(envBase)) {
 		return envBase;
 	}
 
-	// Jika pathname berada di bawah /admin standar
 	if (cleanPath === "/admin" || cleanPath.startsWith("/admin/")) {
 		return "/admin";
 	}
 
-	// Jika pengguna berada langsung di root path kustom (mis. /pengurus-siman)
-	if (cleanPath && !cleanPath.startsWith("/api") && !cleanPath.startsWith("/_next")) {
+	// Jika pengguna berada langsung di root path kustom admin (mis. /opop)
+	if (
+		cleanPath &&
+		(!explicitLogin || cleanPath !== explicitLogin) &&
+		!cleanPath.startsWith("/api") &&
+		!cleanPath.startsWith("/_next")
+	) {
 		return cleanPath;
 	}
 
@@ -91,19 +141,15 @@ export function resolveAdminBase(currentPathname?: string): string {
 }
 
 /**
- * Mendapatkan rute login aktif sesuai konteks path admin yang sedang dibuka.
+ * Mendapatkan rute login aktif sesuai konteks runtime.
  */
 export function getLoginRoute(currentPathname?: string): string {
-	if (customLogin && customLogin !== "/login") {
-		return customLogin;
-	}
-	const adminBase = resolveAdminBase(currentPathname);
-	return adminBase !== "/admin" ? `${adminBase}/login` : "/login";
+	return getRuntimeLoginPath(currentPathname);
 }
 
 /**
  * Menghasilkan URL subpath admin lengkap dengan prefix admin yang sesuai.
- * Contoh: adminRoute("/prayer", "/pengurus-siman/whatsapp") -> "/pengurus-siman/prayer"
+ * Contoh: adminRoute("/prayer", "/opop/whatsapp") -> "/opop/prayer"
  */
 export function adminRoute(path = "", currentPathname?: string): string {
 	const base = resolveAdminBase(currentPathname);

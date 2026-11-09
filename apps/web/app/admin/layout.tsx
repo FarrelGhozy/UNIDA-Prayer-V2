@@ -68,6 +68,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 			if (res.data) {
 				setAdmin(res.data);
 			} else {
+				await fetchApi("/api/auth/logout", { method: "POST" }).catch(() => {});
 				router.push(getLoginRoute(pathname));
 				return;
 			}

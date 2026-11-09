@@ -177,12 +177,42 @@ describe("middleware secret admin routing", () => {
 		expect(res.headers.get("x-middleware-rewrite")).toContain("/admin");
 	});
 
-	it("membiarkan rute landing / tanpa intervensi", () => {
+	it("membiarkan rute landing / tanpa intervensi tapi menyertakan cookie path runtime", () => {
 		process.env.NEXT_PUBLIC_ADMIN_PATH = "/pengurus-siman";
+		process.env.NEXT_PUBLIC_LOGIN_PATH = "/gerbang-rahasia";
 
 		const req = new NextRequest("http://localhost:3000/");
 		const res = middleware(req);
 		expect(res.headers.get("x-middleware-rewrite")).toBeNull();
 		expect(res.status).toBe(200);
+
+		// Cookie bridge runtime path terpasang
+		const adminCookie = res.cookies.get("unida_admin_path");
+		const loginCookie = res.cookies.get("unida_login_path");
+		expect(adminCookie?.value).toBe("/pengurus-siman");
+		expect(loginCookie?.value).toBe("/gerbang-rahasia");
+	});
+
+	it("me-redirect subpath login pada admin base ke rute login kustom terpisah", () => {
+		process.env.NEXT_PUBLIC_ADMIN_PATH = "/opop";
+		process.env.NEXT_PUBLIC_LOGIN_PATH = "/masuk88";
+
+		const req = new NextRequest("http://localhost:3000/opop/login");
+		const res = middleware(req);
+		expect(res.status).toBe(307);
+		expect(res.headers.get("location")).toContain("/masuk88");
+	});
+
+	it("mengizinkan akses form login jika menggunakan parameter ?relogin=1 walau ada cookie lama", () => {
+		process.env.NEXT_PUBLIC_ADMIN_PATH = "/opop";
+		process.env.NEXT_PUBLIC_LOGIN_PATH = "/masuk88";
+
+		const req = new NextRequest("http://localhost:3000/masuk88?relogin=1", {
+			headers: {
+				cookie: `unida_prayer_session=${makeTestSessionToken()}`,
+			},
+		});
+		const res = middleware(req);
+		expect(res.headers.get("x-middleware-rewrite")).toContain("/login");
 	});
 });

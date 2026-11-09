@@ -7,17 +7,16 @@ import {
 	Mail,
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { ThemeToggleSwitch } from "../../components/admin/shared/theme-toggle-switch";
 import { DynamicPrayerBackground } from "../../components/landing/dynamic-prayer-background";
 import { UnidaPrayerIcon } from "../../components/shared/unida-prayer-logo";
 import { fetchApi } from "../../lib/api-client";
-import { adminRoute } from "../../lib/admin-path";
+import { getRuntimeAdminPath } from "../../lib/admin-path";
 
 export default function LoginPage() {
 	const router = useRouter();
-	const pathname = usePathname();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [loading, setLoading] = useState(false);
@@ -50,7 +49,7 @@ export default function LoginPage() {
 		});
 
 		if (res.data) {
-			router.push(adminRoute("/", pathname));
+			router.push(getRuntimeAdminPath());
 		} else if (res.error) {
 			setError(res.error.message);
 		}

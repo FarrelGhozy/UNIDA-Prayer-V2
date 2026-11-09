@@ -74,6 +74,7 @@ export const authRoutes = new Elysia({ prefix: "/api/auth" })
 			return ok(admin);
 		} catch (error) {
 			if (error instanceof AuthError) {
+				cookie[SESSION_COOKIE_NAME]?.remove();
 				return status(error.statusCode, fail(error.code as ErrorCode, error.message));
 			}
 			throw error;
