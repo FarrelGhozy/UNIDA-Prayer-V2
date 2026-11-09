@@ -59,7 +59,7 @@ export function NextPrayerHero({
 			</div>
 
 			<div className="relative z-10 flex flex-col items-center text-center lg:flex-row lg:items-center lg:justify-between lg:text-left gap-6">
-				<div className="flex flex-col items-center text-center lg:items-start lg:text-left space-y-5 max-w-2xl w-full order-2 lg:order-1">
+				<div className="flex flex-col items-center text-center lg:items-start lg:text-left space-y-5 max-w-2xl w-full order-1 lg:order-1">
 					<div className="space-y-2.5 flex flex-col items-center lg:items-start">
 						{isIqamahMode ? (
 							<div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-500/25 px-3.5 py-1.5 text-xs font-bold text-emerald-300 shadow-[0_0_16px_rgba(16,185,129,0.35),inset_0_1px_1px_rgba(255,255,255,0.4)] backdrop-blur-xl">
@@ -131,7 +131,7 @@ export function NextPrayerHero({
 				</div>
 
 				{countdown && (
-					<div className="relative overflow-hidden rounded-2xl border border-white/25 bg-black/25 p-5 sm:p-6 text-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.25),0_12px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl shrink-0 self-center order-1 lg:order-2 w-full max-w-xs sm:max-w-sm lg:w-auto">
+					<div className="relative overflow-hidden rounded-2xl border border-white/25 bg-black/25 p-5 sm:p-6 text-center shadow-[inset_0_1px_2px_rgba(255,255,255,0.25),0_12px_32px_rgba(0,0,0,0.3)] backdrop-blur-xl shrink-0 self-center order-2 lg:order-2 w-full max-w-xs sm:max-w-sm lg:w-auto">
 						<div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-linear-to-b from-white/10 to-transparent" />
 						<span className="text-[11px] font-semibold uppercase tracking-wider text-slate-300">
 							{countdownLabel}
