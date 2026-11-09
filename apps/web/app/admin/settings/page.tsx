@@ -4,6 +4,10 @@ import { RefreshCw, Save } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { fetchApi } from "../../../lib/api-client";
 import { ContentSettingsCard } from "../../../components/admin/settings/content-settings-card";
+import {
+	IqamahSettingsCard,
+	type IqamahIntervals,
+} from "../../../components/admin/settings/iqamah-settings-card";
 import { KillSwitchBanner } from "../../../components/admin/settings/kill-switch-banner";
 import { KillSwitchModal } from "../../../components/admin/settings/kill-switch-modal";
 import { ReminderSettingsCard } from "../../../components/admin/settings/reminder-settings-card";
@@ -48,6 +52,11 @@ interface SettingsPayload {
 	content_settings: {
 		includeHadith: boolean;
 		sendingEnabled: boolean;
+		landingHadithEnabled?: boolean;
+	};
+	iqamah_settings?: {
+		enabled: boolean;
+		intervals: IqamahIntervals;
 	};
 }
 
@@ -59,11 +68,21 @@ export default function AdminSettingsPage() {
 
 	const [sendingEnabled, setSendingEnabled] = useState(true);
 	const [includeHadith, setIncludeHadith] = useState(true);
+	const [landingHadithEnabled, setLandingHadithEnabled] = useState(true);
 	const [reminderEnabled, setReminderEnabled] = useState(true);
 	const [adhanEnabled, setAdhanEnabled] = useState(true);
 	const [preReminderEnabled, setPreReminderEnabled] = useState(true);
 	const [preReminderMinutes, setPreReminderMinutes] = useState(3);
 	const [lateGraceMinutes, setLateGraceMinutes] = useState(5);
+
+	const [iqamahEnabled, setIqamahEnabled] = useState(true);
+	const [iqamahIntervals, setIqamahIntervals] = useState<IqamahIntervals>({
+		FAJR: 15,
+		DHUHR: 10,
+		ASR: 10,
+		MAGHRIB: 15,
+		ISHA: 10,
+	});
 
 	const [systemStatus, setSystemStatus] = useState<SystemStatusData | null>(null);
 
@@ -83,11 +102,25 @@ export default function AdminSettingsPage() {
 			const s = sRes.data;
 			setSendingEnabled(s.content_settings.sendingEnabled ?? true);
 			setIncludeHadith(s.content_settings.includeHadith ?? true);
+			setLandingHadithEnabled(s.content_settings.landingHadithEnabled ?? true);
 			setReminderEnabled(s.reminder_settings.enabled ?? true);
 			setAdhanEnabled(s.reminder_settings.adhanReminderEnabled ?? true);
 			setPreReminderEnabled(s.reminder_settings.preReminderEnabled ?? true);
 			setPreReminderMinutes(s.reminder_settings.preReminderMinutes ?? 3);
 			setLateGraceMinutes(s.reminder_settings.lateGraceMinutes ?? 5);
+
+			if (s.iqamah_settings) {
+				setIqamahEnabled(s.iqamah_settings.enabled ?? true);
+				if (s.iqamah_settings.intervals) {
+					setIqamahIntervals({
+						FAJR: s.iqamah_settings.intervals.FAJR ?? 15,
+						DHUHR: s.iqamah_settings.intervals.DHUHR ?? 10,
+						ASR: s.iqamah_settings.intervals.ASR ?? 10,
+						MAGHRIB: s.iqamah_settings.intervals.MAGHRIB ?? 15,
+						ISHA: s.iqamah_settings.intervals.ISHA ?? 10,
+					});
+				}
+			}
 		} else if (sRes.error) {
 			setError(sRes.error.message);
 		}
@@ -147,6 +180,7 @@ export default function AdminSettingsPage() {
 				content_settings: {
 					sendingEnabled,
 					includeHadith,
+					landingHadithEnabled,
 				},
 				reminder_settings: {
 					enabled: reminderEnabled,
@@ -154,6 +188,10 @@ export default function AdminSettingsPage() {
 					preReminderEnabled,
 					preReminderMinutes,
 					lateGraceMinutes,
+				},
+				iqamah_settings: {
+					enabled: iqamahEnabled,
+					intervals: iqamahIntervals,
 				},
 			}),
 		});
@@ -170,7 +208,7 @@ export default function AdminSettingsPage() {
 		<div className="space-y-6">
 			<AdminPageHeader
 				title="Pengaturan Sistem & Pengiriman"
-				description="Kontrol darurat pengiriman pesan (kill-switch), kebijakan reminder, dan diagnostik server."
+				description="Kontrol darurat pengiriman pesan (kill-switch), kebijakan reminder, jeda iqomah, dan konten hadits."
 			>
 				<button
 					type="button"
@@ -214,9 +252,20 @@ export default function AdminSettingsPage() {
 								onChangeLateGrace={setLateGraceMinutes}
 							/>
 
+							<IqamahSettingsCard
+								enabled={iqamahEnabled}
+								intervals={iqamahIntervals}
+								onChangeEnabled={setIqamahEnabled}
+								onChangeInterval={(prayer, val) =>
+									setIqamahIntervals((prev) => ({ ...prev, [prayer]: val }))
+								}
+							/>
+
 							<ContentSettingsCard
 								includeHadith={includeHadith}
+								landingHadithEnabled={landingHadithEnabled}
 								onChangeIncludeHadith={setIncludeHadith}
+								onChangeLandingHadithEnabled={setLandingHadithEnabled}
 							/>
 
 							<div className="glass-panel glass-sheen flex justify-end rounded-2xl border border-slate-200/80 bg-white/95 p-4 shadow-2xs backdrop-blur-md dark:border-white/10 dark:bg-[#0D1C2E]/80">

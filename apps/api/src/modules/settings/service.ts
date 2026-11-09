@@ -13,6 +13,11 @@ export interface AdminSettingsPayload {
 	content_settings?: {
 		includeHadith?: boolean;
 		sendingEnabled?: boolean;
+		landingHadithEnabled?: boolean;
+	};
+	iqamah_settings?: {
+		enabled?: boolean;
+		intervals?: Partial<ResolvedSettings["iqamah"]["intervals"]>;
 	};
 }
 
@@ -26,7 +31,9 @@ export interface AdminSettingsResponse {
 		content_settings: {
 			includeHadith: boolean;
 			sendingEnabled: boolean;
+			landingHadithEnabled: boolean;
 		};
+		iqamah_settings: ResolvedSettings["iqamah"];
 	};
 	recalculateSummary?: RecalculateResult;
 }
@@ -42,6 +49,7 @@ export async function getAdminSettings(): Promise<AdminSettingsResponse["setting
 	const content = (map.get("content_settings") as {
 		includeHadith?: boolean;
 		sendingEnabled?: boolean;
+		landingHadithEnabled?: boolean;
 	}) ?? {};
 
 	return {
@@ -53,7 +61,9 @@ export async function getAdminSettings(): Promise<AdminSettingsResponse["setting
 		content_settings: {
 			includeHadith: content.includeHadith ?? true,
 			sendingEnabled: content.sendingEnabled ?? true,
+			landingHadithEnabled: content.landingHadithEnabled ?? true,
 		},
+		iqamah_settings: resolved.iqamah,
 	};
 }
 
@@ -109,6 +119,20 @@ export async function updateAdminSettings(
 			.insert(appSettings)
 			.values({ key: "content_settings", value: newContent, updatedAt: now })
 			.onDuplicateKeyUpdate({ set: { value: newContent, updatedAt: now } });
+	}
+
+	if (patch.iqamah_settings) {
+		const newIqamah = {
+			enabled: typeof patch.iqamah_settings.enabled === "boolean" ? patch.iqamah_settings.enabled : current.iqamah_settings.enabled,
+			intervals: {
+				...current.iqamah_settings.intervals,
+				...patch.iqamah_settings.intervals,
+			},
+		};
+		await db
+			.insert(appSettings)
+			.values({ key: "iqamah_settings", value: newIqamah, updatedAt: now })
+			.onDuplicateKeyUpdate({ set: { value: newIqamah, updatedAt: now } });
 	}
 
 	// Trigger regenerasi job PENDING masa depan bila setting hisab / jadwal berubah
