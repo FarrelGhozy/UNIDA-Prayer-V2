@@ -202,10 +202,28 @@ export default function HomePage() {
 
 	const theme: "light" | "dark" = paramTheme || (isDaytime ? "light" : "dark");
 
+	const effectiveServerTime = useMemo(() => {
+		if (paramPhase && data) {
+			switch (paramPhase) {
+				case "SUBUH":
+					return new Date(data.times.FAJR.utc).getTime() + 60000;
+				case "DZUHUR":
+					return new Date(data.times.DHUHR.utc).getTime() + 60000;
+				case "ASHAR":
+					return new Date(data.times.ASR.utc).getTime() + 60000;
+				case "MAGHRIB":
+					return new Date(data.times.MAGHRIB.utc).getTime() + 60000;
+				case "ISHA":
+					return new Date(data.times.ISHA.utc).getTime() + 60000;
+			}
+		}
+		return now !== null ? now + serverSkewMs : null;
+	}, [data, now, paramPhase, serverSkewMs]);
+
 	// Evaluasi mode jeda Iqomah bila diaktifkan di sistem
 	const iqamahWindow = useMemo(() => {
 		if (!now || !data?.times || !data.iqamah?.enabled) return null;
-		const currentServerTime = now + serverSkewMs;
+		const currentServerTime = effectiveServerTime ?? (now + serverSkewMs);
 		const fardOrder: Array<"ISHA" | "MAGHRIB" | "ASR" | "DHUHR" | "FAJR"> = [
 			"ISHA",
 			"MAGHRIB",
@@ -236,7 +254,7 @@ export default function HomePage() {
 			}
 		}
 		return null;
-	}, [data, now, serverSkewMs]);
+	}, [data, now, serverSkewMs, effectiveServerTime]);
 
 	// Auto-advance jadwal shalat & pergantian hari (Midnight 00:00:00 Rollover & Transisi Iqomah):
 	// Memastikan halaman tetap akurat dan tidak stuck/freeze bila dibiarkan menyala berhari-hari.
@@ -354,24 +372,6 @@ export default function HomePage() {
 			year: "numeric",
 		});
 	}, [data?.dateLocal]);
-
-	const effectiveServerTime = useMemo(() => {
-		if (paramPhase && data) {
-			switch (paramPhase) {
-				case "SUBUH":
-					return new Date(data.times.FAJR.utc).getTime() + 60000;
-				case "DZUHUR":
-					return new Date(data.times.DHUHR.utc).getTime() + 60000;
-				case "ASHAR":
-					return new Date(data.times.ASR.utc).getTime() + 60000;
-				case "MAGHRIB":
-					return new Date(data.times.MAGHRIB.utc).getTime() + 60000;
-				case "ISHA":
-					return new Date(data.times.ISHA.utc).getTime() + 60000;
-			}
-		}
-		return now !== null ? now + serverSkewMs : null;
-	}, [data, now, paramPhase, serverSkewMs]);
 
 	const getSlotStatus = useCallback(
 		(utcString: string, prayerName: string): SlotStatus => {
