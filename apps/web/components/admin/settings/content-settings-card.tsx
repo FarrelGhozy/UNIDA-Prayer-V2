@@ -1,13 +1,18 @@
-import { Sliders } from "lucide-react";
+import { BookOpen, Sliders } from "lucide-react";
+import { ToggleSwitch } from "../../shared/toggle-switch";
 
 interface ContentSettingsCardProps {
 	includeHadith: boolean;
+	landingHadithEnabled?: boolean;
 	onChangeIncludeHadith: (val: boolean) => void;
+	onChangeLandingHadithEnabled?: (val: boolean) => void;
 }
 
 export function ContentSettingsCard({
 	includeHadith,
+	landingHadithEnabled = true,
 	onChangeIncludeHadith,
+	onChangeLandingHadithEnabled,
 }: ContentSettingsCardProps) {
 	return (
 		<div className="glass-panel glass-sheen rounded-3xl border border-slate-200/80 bg-white/95 p-5 sm:p-6 shadow-2xs space-y-4 dark:border-white/10 dark:bg-[#0D1C2E]/80">
@@ -18,24 +23,32 @@ export function ContentSettingsCard({
 				</h2>
 			</div>
 
-			<div className="space-y-3 text-xs">
-				<div className="flex items-start gap-3">
-					<input
-						type="checkbox"
-						id="include-hadith-check"
-						checked={includeHadith}
-						onChange={(e) => onChangeIncludeHadith(e.target.checked)}
-						className="mt-0.5 h-4 w-4 rounded-md border-slate-300 text-[#123B6D] focus:ring-[#1D5FA7] dark:border-white/20 dark:bg-slate-900/60"
-					/>
-					<label htmlFor="include-hadith-check" className="cursor-pointer">
-						<span className="font-bold text-[#102A46] dark:text-slate-200">
-							Sertakan Kutipan Hadits / Ayat Harian pada Pesan Adzan
-						</span>
-						<p className="text-[#64748B] text-[11px] mt-0.5 dark:text-slate-400">
-							Bila diaktifkan, bot akan memilih hadits aktif secara acak dan bergiliran untuk disisipkan ke dalam pesan adzan.
-						</p>
-					</label>
-				</div>
+			<div className="space-y-4 text-xs">
+				<ToggleSwitch
+					id="include-hadith-switch"
+					checked={includeHadith}
+					onChange={onChangeIncludeHadith}
+					label="Sertakan Hadits / Ayat Harian pada Pesan Adzan"
+					description="Bila diaktifkan, bot akan memilih hadits aktif secara acak dan bergiliran untuk disisipkan ke dalam pesan adzan WhatsApp."
+				/>
+
+				{onChangeLandingHadithEnabled && (
+					<div className="border-t border-slate-100 dark:border-white/5 pt-3">
+						<ToggleSwitch
+							id="landing-hadith-switch"
+							checked={landingHadithEnabled}
+							onChange={onChangeLandingHadithEnabled}
+							label={
+								<span className="inline-flex items-center gap-1.5">
+									<BookOpen className="h-3.5 w-3.5 text-[#1D5FA7] dark:text-sky-400" />
+									Tampilkan Kutipan Hadits di Halaman Utama (Landing)
+								</span>
+							}
+							description="Menampilkan kutipan hadits/ayat pilihan secara acak dari sistem di bawah tabel jadwal mingguan pada halaman publik."
+							variant="emerald"
+						/>
+					</div>
+				)}
 			</div>
 		</div>
 	);

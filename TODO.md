@@ -72,3 +72,11 @@
 - [x] Scheduler: pre+adzan × 5 waktu, multi-grup, tanpa duplikat, DB-backed, survive restart, gagal satu tak blokir lain, expired tepat
 - [x] Logs: status di dashboard, riwayat filter, SENT/FAILED di DB, teknis via Docker logs
 - [x] Deploy: push main → CI hijau → image GHCR; server tanpa build; pull+up update; MySQL tetap di luar Compose
+
+## Fase 7 — Evaluasi & Penyempurnaan V2 (Pergantian Nomor WA, Iqomah, Landing Dinamis, & Toggles)
+
+- [x] Poin 1: Deteksi pergantian akun WA (`whatsapp_account`), pembersihan total target lama & antrean pesan akun lama, dan sinkronisasi grup baru dengan status awal nonaktif.
+- [x] Poin 2: Status WhatsApp dinamis di `WhatsappBanner` landing page (Terhubung / Terputus / Dijeda) dengan sanitasi data dan cache in-memory.
+- [x] Poin 3: Kutipan Hadits Acak di bawah jadwal mingguan (`RandomHadithCard`) dari tabel `hadiths` dengan saklar on/off di pengaturan konten.
+- [x] Poin 4: Countdown jeda Adzan ke Iqomah di kartu utama (`NextPrayerHero`) dengan interval per waktu shalat (default Subuh & Maghrib 15 menit, lainnya 10 menit), transisi 30 detik saat iqomah, serta auto-advance anti-stuck.
+- [x] Poin 5: Komponen reusable `ToggleSwitch` frosted glass menggantikan seluruh checkbox HTML pada halaman pengaturan admin.

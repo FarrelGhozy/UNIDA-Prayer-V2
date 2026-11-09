@@ -5,8 +5,9 @@ import { DynamicPrayerBackground } from "../components/landing/dynamic-prayer-ba
 import { ErrorState } from "../components/landing/error-state";
 import { Footer } from "../components/landing/footer";
 import { Header } from "../components/landing/header";
-import { NextPrayerHero } from "../components/landing/next-prayer-hero";
+import { NextPrayerHero, type HeroPrayerDisplay } from "../components/landing/next-prayer-hero";
 import { PrayerTimesGrid } from "../components/landing/prayer-times-grid";
+import { RandomHadithCard } from "../components/landing/random-hadith-card";
 import { SkeletonLoading } from "../components/landing/skeleton-loading";
 import { ValidationNotice } from "../components/landing/validation-notice";
 import { WeeklyPrayerTable } from "../components/landing/weekly-prayer-table";
@@ -201,7 +202,61 @@ export default function HomePage() {
 
 	const theme: "light" | "dark" = paramTheme || (isDaytime ? "light" : "dark");
 
-	// Auto-advance jadwal shalat & pergantian hari (Midnight 00:00:00 Rollover):
+	const effectiveServerTime = useMemo(() => {
+		if (paramPhase && data) {
+			switch (paramPhase) {
+				case "SUBUH":
+					return new Date(data.times.FAJR.utc).getTime() + 60000;
+				case "DZUHUR":
+					return new Date(data.times.DHUHR.utc).getTime() + 60000;
+				case "ASHAR":
+					return new Date(data.times.ASR.utc).getTime() + 60000;
+				case "MAGHRIB":
+					return new Date(data.times.MAGHRIB.utc).getTime() + 60000;
+				case "ISHA":
+					return new Date(data.times.ISHA.utc).getTime() + 60000;
+			}
+		}
+		return now !== null ? now + serverSkewMs : null;
+	}, [data, now, paramPhase, serverSkewMs]);
+
+	// Evaluasi mode jeda Iqomah bila diaktifkan di sistem
+	const iqamahWindow = useMemo(() => {
+		if (!now || !data?.times || !data.iqamah?.enabled) return null;
+		const currentServerTime = effectiveServerTime ?? (now + serverSkewMs);
+		const fardOrder: Array<"ISHA" | "MAGHRIB" | "ASR" | "DHUHR" | "FAJR"> = [
+			"ISHA",
+			"MAGHRIB",
+			"ASR",
+			"DHUHR",
+			"FAJR",
+		];
+
+		for (const prayerName of fardOrder) {
+			const prayerSlot = data.times[prayerName];
+			if (!prayerSlot?.utc) continue;
+			const tAdzan = new Date(prayerSlot.utc).getTime();
+			const intervalMinutes = data.iqamah.intervals[prayerName] ?? 10;
+			const tIqamah = tAdzan + intervalMinutes * 60 * 1000;
+			const tIqamahEnd = tIqamah + 30 * 1000; // 30 detik transisi saat Iqomah berkumandang
+
+			if (currentServerTime >= tAdzan && currentServerTime < tIqamahEnd) {
+				const isIqamahActive = currentServerTime >= tIqamah;
+				return {
+					prayerName,
+					displayName: prayerSlot.displayName,
+					timeLabel: prayerSlot.timeLabel,
+					tAdzan,
+					tIqamah,
+					tIqamahEnd,
+					isIqamahActive,
+				};
+			}
+		}
+		return null;
+	}, [data, now, serverSkewMs, effectiveServerTime]);
+
+	// Auto-advance jadwal shalat & pergantian hari (Midnight 00:00:00 Rollover & Transisi Iqomah):
 	// Memastikan halaman tetap akurat dan tidak stuck/freeze bila dibiarkan menyala berhari-hari.
 	useEffect(() => {
 		if (!now || !data) return;
@@ -222,31 +277,77 @@ export default function HomePage() {
 		const isPrayerTimeArrived =
 			targetUtc !== null && currentServerTime >= targetUtc;
 
-		if (isDayChanged || isPrayerTimeArrived) {
-			const eventKey = `${todayDateLocal}:${nextPrayerUtc ?? ""}`;
+		// 3. Deteksi waktu transisi iqomah selesai (30 detik setelah iqomah)
+		const isIqamahEnded =
+			iqamahWindow !== null && currentServerTime >= iqamahWindow.tIqamahEnd;
+
+		if (isDayChanged || isPrayerTimeArrived || isIqamahEnded) {
+			const eventKey = `${todayDateLocal}:${nextPrayerUtc ?? ""}:${iqamahWindow?.prayerName ?? ""}:${isIqamahEnded}`;
 			if (lastAdvanceKeyRef.current !== eventKey && !isFetchingRef.current) {
 				lastAdvanceKeyRef.current = eventKey;
 				loadPrayerData(true);
 			}
 		}
-	}, [now, data, serverSkewMs, loadPrayerData]);
+	}, [now, data, serverSkewMs, iqamahWindow, loadPrayerData]);
 
-	const countdown = useMemo(() => {
-		if (!now || !data?.nextPrayer?.scheduledAtUtc) return null;
-		const targetUtc = new Date(data.nextPrayer.scheduledAtUtc).getTime();
+	const { heroDisplay, countdown } = useMemo(() => {
+		if (!now || !data?.nextPrayer?.scheduledAtUtc) {
+			return { heroDisplay: undefined, countdown: null };
+		}
 		const currentServerTime = now + serverSkewMs;
+
+		if (iqamahWindow) {
+			const isIqamahActive = iqamahWindow.isIqamahActive;
+			const diffSeconds = isIqamahActive
+				? 0
+				: Math.max(0, Math.floor((iqamahWindow.tIqamah - currentServerTime) / 1000));
+
+			const hours = Math.floor(diffSeconds / 3600);
+			const minutes = Math.floor((diffSeconds % 3600) / 60);
+			const seconds = diffSeconds % 60;
+
+			const display: HeroPrayerDisplay = {
+				displayName: iqamahWindow.displayName,
+				timeLabel: iqamahWindow.timeLabel,
+				isTomorrow: false,
+				mode: isIqamahActive ? "IQAMAH_ACTIVE" : "IQAMAH_COUNTDOWN",
+				countdownLabel: isIqamahActive ? "Waktu Iqomah Tiba" : "Menuju Kumandang Iqomah",
+			};
+
+			return {
+				heroDisplay: display,
+				countdown: {
+					hours: String(hours).padStart(2, "0"),
+					minutes: String(minutes).padStart(2, "0"),
+					seconds: String(seconds).padStart(2, "0"),
+				},
+			};
+		}
+
+		const targetUtc = new Date(data.nextPrayer.scheduledAtUtc).getTime();
 		const diffSeconds = Math.max(0, Math.floor((targetUtc - currentServerTime) / 1000));
 
 		const hours = Math.floor(diffSeconds / 3600);
 		const minutes = Math.floor((diffSeconds % 3600) / 60);
 		const seconds = diffSeconds % 60;
 
-		return {
-			hours: String(hours).padStart(2, "0"),
-			minutes: String(minutes).padStart(2, "0"),
-			seconds: String(seconds).padStart(2, "0"),
+		const display: HeroPrayerDisplay = {
+			displayName: data.nextPrayer.displayName,
+			timeLabel: data.nextPrayer.timeLabel,
+			isTomorrow: data.nextPrayer.isTomorrow,
+			mode: "BEFORE_ADHAN",
+			countdownLabel: "Menuju Kumandang Adzan",
 		};
-	}, [data, now, serverSkewMs]);
+
+		return {
+			heroDisplay: display,
+			countdown: {
+				hours: String(hours).padStart(2, "0"),
+				minutes: String(minutes).padStart(2, "0"),
+				seconds: String(seconds).padStart(2, "0"),
+			},
+		};
+	}, [data, now, serverSkewMs, iqamahWindow]);
 
 	const liveTimeString = useMemo(() => {
 		if (!now) return "--:--:--";
@@ -271,24 +372,6 @@ export default function HomePage() {
 			year: "numeric",
 		});
 	}, [data?.dateLocal]);
-
-	const effectiveServerTime = useMemo(() => {
-		if (paramPhase && data) {
-			switch (paramPhase) {
-				case "SUBUH":
-					return new Date(data.times.FAJR.utc).getTime() + 60000;
-				case "DZUHUR":
-					return new Date(data.times.DHUHR.utc).getTime() + 60000;
-				case "ASHAR":
-					return new Date(data.times.ASR.utc).getTime() + 60000;
-				case "MAGHRIB":
-					return new Date(data.times.MAGHRIB.utc).getTime() + 60000;
-				case "ISHA":
-					return new Date(data.times.ISHA.utc).getTime() + 60000;
-			}
-		}
-		return now !== null ? now + serverSkewMs : null;
-	}, [data, now, paramPhase, serverSkewMs]);
 
 	const getSlotStatus = useCallback(
 		(utcString: string, prayerName: string): SlotStatus => {
@@ -356,6 +439,7 @@ export default function HomePage() {
 						<>
 							<NextPrayerHero
 								nextPrayer={data.nextPrayer}
+								heroDisplay={heroDisplay}
 								countdown={countdown}
 								locationName={data.locationName ?? "UNIDA Gontor"}
 								gregorianDateFormatted={gregorianDateFormatted}
@@ -371,7 +455,9 @@ export default function HomePage() {
 
 							<WeeklyPrayerTable days={weeklyDays} loading={loading} />
 
-							<WhatsappBanner />
+							<RandomHadithCard hadith={data.randomHadith} />
+
+							<WhatsappBanner status={data.whatsappStatus} />
 
 							<ValidationNotice />
 						</>

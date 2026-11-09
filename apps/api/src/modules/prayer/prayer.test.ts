@@ -15,6 +15,10 @@ describe("apps/api/modules/prayer", () => {
 		expect(settings.calculation.fajrAngle).toBe(20.0);
 		expect(settings.calculation.ishaAngle).toBe(18.0);
 		expect(settings.reminder.preReminderMinutes).toBe(3);
+		expect(settings.iqamah.enabled).toBe(true);
+		expect(settings.iqamah.intervals.FAJR).toBe(15);
+		expect(settings.iqamah.intervals.DHUHR).toBe(10);
+		expect(settings.iqamah.intervals.MAGHRIB).toBe(15);
 	});
 
 	it("menghitung jadwal hari ini beserta next prayer dan hijriyah", async () => {
@@ -27,6 +31,9 @@ describe("apps/api/modules/prayer", () => {
 		expect(today.nextPrayer).toBeDefined();
 		expect(today.hijri.formatted).toBeDefined();
 		expect(today.serverNowUtc).toBeDefined();
+		expect(today.iqamah).toBeDefined();
+		expect(today.whatsappStatus).toBeDefined();
+		expect(["CONNECTED", "DISCONNECTED", "PAUSED"]).toContain(today.whatsappStatus.state);
 	});
 
 	it("menangani hari Jumat dan mengubah label Sholat Jumat", async () => {

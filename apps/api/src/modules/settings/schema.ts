@@ -45,6 +45,21 @@ export const patchSettingsBodySchema = t.Object({
 		t.Object({
 			includeHadith: t.Optional(t.Boolean()),
 			sendingEnabled: t.Optional(t.Boolean()),
+			landingHadithEnabled: t.Optional(t.Boolean()),
+		}),
+	),
+	iqamah_settings: t.Optional(
+		t.Object({
+			enabled: t.Optional(t.Boolean()),
+			intervals: t.Optional(
+				t.Object({
+					FAJR: t.Optional(t.Integer({ minimum: 1, maximum: 60 })),
+					DHUHR: t.Optional(t.Integer({ minimum: 1, maximum: 60 })),
+					ASR: t.Optional(t.Integer({ minimum: 1, maximum: 60 })),
+					MAGHRIB: t.Optional(t.Integer({ minimum: 1, maximum: 60 })),
+					ISHA: t.Optional(t.Integer({ minimum: 1, maximum: 60 })),
+				}),
+			),
 		}),
 	),
 });

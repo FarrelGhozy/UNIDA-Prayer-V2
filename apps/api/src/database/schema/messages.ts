@@ -31,7 +31,7 @@ export const scheduledMessages = mysqlTable(
 			.notNull()
 			.references(() => messageTargets.id, {
 				onUpdate: "cascade",
-				onDelete: "restrict",
+				onDelete: "cascade",
 			}),
 		prayerTimeUtc: datetime("prayer_time_utc", { fsp: 3 }).notNull(),
 		scheduledAtUtc: datetime("scheduled_at_utc", { fsp: 3 }).notNull(),

@@ -9,8 +9,25 @@ import {
 	type PrayerTimesResult,
 } from "@unida-prayer/prayer-engine";
 import { formatInTimeZone } from "date-fns-tz";
+import { eq } from "drizzle-orm";
 import { db } from "../../database/client";
 import { appSettings } from "../../database/schema/appSettings";
+import { hadiths } from "../../database/schema/hadiths";
+import { messageTargets } from "../../database/schema/targets";
+import { getSessionStatus } from "../../integrations/waha";
+
+export type FardPrayerName = "FAJR" | "DHUHR" | "ASR" | "MAGHRIB" | "ISHA";
+
+export interface IqamahSettings {
+	enabled: boolean;
+	intervals: Record<FardPrayerName, number>;
+}
+
+export interface PublicWhatsappStatus {
+	state: "CONNECTED" | "DISCONNECTED" | "PAUSED";
+	activeGroupsCount: number;
+	preReminderMinutes: number;
+}
 
 export interface ResolvedSettings {
 	location: {
@@ -36,6 +53,7 @@ export interface ResolvedSettings {
 		preReminderMinutes: number;
 		lateGraceMinutes: number;
 	};
+	iqamah: IqamahSettings;
 }
 
 export const DEFAULT_SETTINGS: ResolvedSettings = {
@@ -69,6 +87,16 @@ export const DEFAULT_SETTINGS: ResolvedSettings = {
 		preReminderMinutes: 3,
 		lateGraceMinutes: 5,
 	},
+	iqamah: {
+		enabled: true,
+		intervals: {
+			FAJR: 15,
+			DHUHR: 10,
+			ASR: 10,
+			MAGHRIB: 15,
+			ISHA: 10,
+		},
+	},
 };
 
 function isValidTimezone(tz: string): boolean {
@@ -92,6 +120,8 @@ export async function getResolvedSettings(): Promise<ResolvedSettings> {
 	const adj = map.get("prayer_adjustments") as Partial<Record<string, number>> | undefined;
 	const hij = map.get("hijri_settings") as Partial<ResolvedSettings["hijri"]> | undefined;
 	const rem = map.get("reminder_settings") as Partial<ResolvedSettings["reminder"]> | undefined;
+	const iqamah = map.get("iqamah_settings") as Partial<IqamahSettings> | undefined;
+	const iqIntervals = iqamah?.intervals;
 
 	const tzRaw = typeof loc?.timezone === "string" ? loc.timezone : DEFAULT_SETTINGS.location.timezone;
 	const timezone = isValidTimezone(tzRaw) ? tzRaw : DEFAULT_SETTINGS.location.timezone;
@@ -127,7 +157,40 @@ export async function getResolvedSettings(): Promise<ResolvedSettings> {
 			preReminderMinutes: typeof rem?.preReminderMinutes === "number" ? rem.preReminderMinutes : DEFAULT_SETTINGS.reminder.preReminderMinutes,
 			lateGraceMinutes: typeof rem?.lateGraceMinutes === "number" ? rem.lateGraceMinutes : DEFAULT_SETTINGS.reminder.lateGraceMinutes,
 		},
+		iqamah: {
+			enabled: typeof iqamah?.enabled === "boolean" ? iqamah.enabled : DEFAULT_SETTINGS.iqamah.enabled,
+			intervals: {
+				FAJR: typeof iqIntervals?.FAJR === "number" ? iqIntervals.FAJR : DEFAULT_SETTINGS.iqamah.intervals.FAJR,
+				DHUHR: typeof iqIntervals?.DHUHR === "number" ? iqIntervals.DHUHR : DEFAULT_SETTINGS.iqamah.intervals.DHUHR,
+				ASR: typeof iqIntervals?.ASR === "number" ? iqIntervals.ASR : DEFAULT_SETTINGS.iqamah.intervals.ASR,
+				MAGHRIB: typeof iqIntervals?.MAGHRIB === "number" ? iqIntervals.MAGHRIB : DEFAULT_SETTINGS.iqamah.intervals.MAGHRIB,
+				ISHA: typeof iqIntervals?.ISHA === "number" ? iqIntervals.ISHA : DEFAULT_SETTINGS.iqamah.intervals.ISHA,
+			},
+		},
 	};
+}
+
+let cachedWahaState: { status: string; expiresAt: number } | null = null;
+
+async function getCachedWahaWorking(): Promise<boolean> {
+	const now = Date.now();
+	if (cachedWahaState && cachedWahaState.expiresAt > now) {
+		return cachedWahaState.status === "WORKING";
+	}
+	try {
+		const session = await getSessionStatus();
+		cachedWahaState = {
+			status: session.status,
+			expiresAt: now + 20_000,
+		};
+		return session.status === "WORKING";
+	} catch {
+		cachedWahaState = {
+			status: "FAILED",
+			expiresAt: now + 20_000,
+		};
+		return false;
+	}
 }
 
 export interface TodayPrayerResponse {
@@ -143,6 +206,9 @@ export interface TodayPrayerResponse {
 	times: PrayerTimesResult["times"];
 	nextPrayer: NextPrayerInfo;
 	serverNowUtc: string;
+	iqamah: IqamahSettings;
+	randomHadith?: { id: number; text: string; source: string } | null;
+	whatsappStatus: PublicWhatsappStatus;
 }
 
 export async function getTodayPrayer(dateQuery?: string): Promise<TodayPrayerResponse> {
@@ -180,6 +246,56 @@ export async function getTodayPrayer(dateQuery?: string): Promise<TodayPrayerRes
 		},
 	});
 
+	const rows = await db.select().from(appSettings);
+	const map = new Map<string, unknown>();
+	for (const row of rows) {
+		map.set(row.key, row.value);
+	}
+	const content = (map.get("content_settings") as {
+		includeHadith?: boolean;
+		sendingEnabled?: boolean;
+		landingHadithEnabled?: boolean;
+	}) ?? {};
+
+	let randomHadith: { id: number; text: string; source: string } | null = null;
+	if (content.landingHadithEnabled !== false) {
+		const activeHadiths = await db
+			.select({ id: hadiths.id, text: hadiths.text, source: hadiths.source })
+			.from(hadiths)
+			.where(eq(hadiths.isActive, true));
+		if (activeHadiths.length > 0) {
+			const picked =
+				activeHadiths[Math.floor(Math.random() * activeHadiths.length)];
+			if (picked) {
+				randomHadith = picked;
+			}
+		}
+	}
+
+	const activeTargets = await db
+		.select({ id: messageTargets.id })
+		.from(messageTargets)
+		.where(eq(messageTargets.isActive, true));
+
+	const isPaused =
+		!settings.reminder.enabled || content.sendingEnabled === false;
+
+	let waState: "CONNECTED" | "DISCONNECTED" | "PAUSED" = "DISCONNECTED";
+	if (isPaused) {
+		waState = "PAUSED";
+	} else if (activeTargets.length === 0) {
+		waState = "DISCONNECTED";
+	} else {
+		const isWahaWorking = await getCachedWahaWorking();
+		waState = isWahaWorking ? "CONNECTED" : "DISCONNECTED";
+	}
+
+	const whatsappStatus: PublicWhatsappStatus = {
+		state: waState,
+		activeGroupsCount: activeTargets.length,
+		preReminderMinutes: settings.reminder.preReminderMinutes,
+	};
+
 	return {
 		locationName: settings.location.name,
 		timezone: settings.location.timezone,
@@ -193,6 +309,9 @@ export async function getTodayPrayer(dateQuery?: string): Promise<TodayPrayerRes
 		times: prayerTimes.times,
 		nextPrayer,
 		serverNowUtc: now.toISOString(),
+		iqamah: settings.iqamah,
+		randomHadith,
+		whatsappStatus,
 	};
 }
 
@@ -332,6 +451,7 @@ export async function getPublicSettings() {
 		methodLabel: settings.calculation.methodLabel,
 		preReminderMinutes: settings.reminder.preReminderMinutes,
 		hijriAdjustmentDays: settings.hijri.adjustmentDays,
+		iqamah: settings.iqamah,
 	};
 }
 
