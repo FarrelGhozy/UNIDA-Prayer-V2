@@ -1,4 +1,5 @@
 import { Clock } from "lucide-react";
+import { ToggleSwitch } from "../../shared/toggle-switch";
 
 interface ReminderSettingsCardProps {
 	reminderEnabled: boolean;
@@ -35,61 +36,35 @@ export function ReminderSettingsCard({
 			</div>
 
 			<div className="space-y-4 text-xs">
-				<div className="flex items-start gap-3">
-					<input
-						type="checkbox"
-						id="reminder-enabled-check"
-						checked={reminderEnabled}
-						onChange={(e) => onChangeReminderEnabled(e.target.checked)}
-						className="mt-0.5 h-4 w-4 rounded-md border-slate-300 text-[#123B6D] focus:ring-[#1D5FA7] dark:border-white/20 dark:bg-slate-900/60"
-					/>
-					<label htmlFor="reminder-enabled-check" className="cursor-pointer">
-						<span className="font-bold text-[#102A46] dark:text-slate-200">
-							Aktifkan Seluruh Jadwal Pengingat Shalat
-						</span>
-						<p className="text-slate-600 font-medium text-[11px] mt-0.5 dark:text-slate-400">
-							Bila dinonaktifkan, generator tidak akan membuat jadwal pesan baru.
-						</p>
-					</label>
-				</div>
+				<ToggleSwitch
+					id="reminder-enabled-switch"
+					checked={reminderEnabled}
+					onChange={onChangeReminderEnabled}
+					label="Aktifkan Seluruh Jadwal Pengingat Shalat"
+					description="Bila dinonaktifkan, generator tidak akan membuat jadwal pesan baru."
+				/>
 
-				<div className="flex items-start gap-3">
-					<input
-						type="checkbox"
-						id="adhan-enabled-check"
+				<div className="border-t border-slate-100 dark:border-white/5 pt-3">
+					<ToggleSwitch
+						id="adhan-enabled-switch"
 						checked={adhanEnabled}
-						onChange={(e) => onChangeAdhanEnabled(e.target.checked)}
-						className="mt-0.5 h-4 w-4 rounded-md border-slate-300 text-[#123B6D] focus:ring-[#1D5FA7] dark:border-white/20 dark:bg-slate-900/60"
+						onChange={onChangeAdhanEnabled}
+						label="Pesan Saat Masuk Waktu Shalat (Adzan)"
+						description="Mengirim pesan tepat saat waktu shalat tiba (Subuh, Dzuhur/Jumat, Ashar, Maghrib, Isya)."
 					/>
-					<label htmlFor="adhan-enabled-check" className="cursor-pointer">
-						<span className="font-bold text-[#102A46] dark:text-slate-200">
-							Pesan Saat Masuk Waktu Shalat (Adzan)
-						</span>
-						<p className="text-slate-600 font-medium text-[11px] mt-0.5 dark:text-slate-400">
-							Mengirim pesan tepat saat waktu shalat tiba (Subuh, Dzuhur/Jumat, Ashar, Maghrib, Isya).
-						</p>
-					</label>
 				</div>
 
-				<div className="flex items-start gap-3">
-					<input
-						type="checkbox"
-						id="pre-reminder-enabled-check"
+				<div className="border-t border-slate-100 dark:border-white/5 pt-3">
+					<ToggleSwitch
+						id="pre-reminder-enabled-switch"
 						checked={preReminderEnabled}
-						onChange={(e) => onChangePreReminderEnabled(e.target.checked)}
-						className="mt-0.5 h-4 w-4 rounded-md border-slate-300 text-[#123B6D] focus:ring-[#1D5FA7] dark:border-white/20 dark:bg-slate-900/60"
+						onChange={onChangePreReminderEnabled}
+						label="Pesan Pengingat Persiapan (Pre-Reminder)"
+						description="Mengirim pengingat beberapa menit sebelum waktu shalat masuk agar jamaah dapat bersiap-siap."
 					/>
-					<label htmlFor="pre-reminder-enabled-check" className="cursor-pointer">
-						<span className="font-bold text-[#102A46] dark:text-slate-200">
-							Pesan Pengingat Persiapan (Pre-Reminder)
-						</span>
-						<p className="text-slate-600 font-medium text-[11px] mt-0.5 dark:text-slate-400">
-							Mengirim pengingat beberapa menit sebelum waktu shalat masuk agar jamaah dapat bersiap-siap.
-						</p>
-					</label>
 				</div>
 
-				<div className="grid grid-cols-1 gap-4 pt-2 sm:grid-cols-2">
+				<div className="grid grid-cols-1 gap-4 pt-3 border-t border-slate-100 dark:border-white/5 sm:grid-cols-2">
 					<div>
 						<label className="block font-bold text-[#102A46] dark:text-slate-200 mb-1">
 							Menit Pre-Reminder:
