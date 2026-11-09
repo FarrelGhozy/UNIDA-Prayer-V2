@@ -11,10 +11,6 @@ services:
       NEXT_PUBLIC_API_BASE_URL: /api
       WEB_URL: ${WEB_URL:-https://prayer.utc.web.id}
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-https://prayer.utc.web.id}
-      ADMIN_PATH: ${ADMIN_PATH:-${NEXT_PUBLIC_ADMIN_PATH:-/admin}}
-      LOGIN_PATH: ${LOGIN_PATH:-${NEXT_PUBLIC_LOGIN_PATH:-/login}}
-      NEXT_PUBLIC_ADMIN_PATH: ${NEXT_PUBLIC_ADMIN_PATH:-${ADMIN_PATH:-/admin}}
-      NEXT_PUBLIC_LOGIN_PATH: ${NEXT_PUBLIC_LOGIN_PATH:-${LOGIN_PATH:-/login}}
     ports:
       - "127.0.0.1:3542:3000"
     networks:
